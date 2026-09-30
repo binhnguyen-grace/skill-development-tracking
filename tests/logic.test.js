@@ -66,4 +66,8 @@ assert.strictEqual(r.details.B.find(x => x.courseId === '701').status, 'Not enro
 r = computeStats({ employees, restaurants, courseIds: ['689'], progress: progress.map(p => ({ ...p, courseId: '' })) });
 eq(names(r), ['B', 'A', 'D']);
 
+// Làm sạch API key
+assert.strictEqual(ctx.cleanApiKey(' "abc\u200B123 "\n'), 'abc123');
+assert.strictEqual(ctx.maskKey('abcdef1234'), '10 ký tự, kết thúc bằng "…1234"');
+
 console.log('All tests passed');

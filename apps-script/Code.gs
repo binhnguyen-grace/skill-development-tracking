@@ -125,6 +125,7 @@ function onOpen() {
     .addItem('1. Thiết lập ban đầu', 'setup')
     .addItem('2. Lưu TalentLMS API key', 'promptApiKey')
     .addItem('3. Kiểm tra kết nối TalentLMS', 'testTalentLMS')
+    .addItem('Xem API key đã lưu (che bớt)', 'showApiKeyInfo')
     .addItem('4. Bật lịch tự động 6h sáng', 'installDailyTrigger')
     .addSeparator()
     .addItem('Lấy dữ liệu TalentLMS ngay', 'menuPull')
@@ -158,10 +159,15 @@ function promptApiKey() {
   var ui = SpreadsheetApp.getUi();
   var res = ui.prompt('TalentLMS API key', 'Dán API key vào đây (key được lưu bảo mật trong Script Properties, không lưu trong sheet):', ui.ButtonSet.OK_CANCEL);
   if (res.getSelectedButton() !== ui.Button.OK) return;
-  var key = res.getResponseText().trim();
+  var key = cleanApiKey(res.getResponseText());
   if (!key) return;
   PropertiesService.getScriptProperties().setProperty('TALENTLMS_API_KEY', key);
-  ui.alert('Đã lưu API key.');
+  ui.alert('Đã lưu API key: ' + maskKey(key) + '\nHãy so với key trên TalentLMS (độ dài và 4 ký tự cuối).');
+}
+
+function showApiKeyInfo() {
+  var key = PropertiesService.getScriptProperties().getProperty('TALENTLMS_API_KEY');
+  SpreadsheetApp.getUi().alert(key ? 'Key đang lưu: ' + maskKey(key) : 'Chưa lưu API key.');
 }
 
 function testTalentLMS() {
@@ -221,7 +227,8 @@ function tlmsGet_(path) {
   if (code !== 200) {
     var msg = res.getContentText();
     try { msg = JSON.parse(msg).error.message; } catch (e) { /* giữ nguyên */ }
-    throw new Error('TalentLMS ' + code + ' (' + path.split('?')[0] + '): ' + String(msg).slice(0, 200));
+    var hint = code === 401 ? '\n→ Kiểm tra: đã bật "Enable API" trên TalentLMS chưa, key có đúng của ' + readConfig_().domain + ' không, hoặc key vừa bị tạo lại (menu 🏆 → 2 để lưu lại).' : '';
+    throw new Error('TalentLMS ' + code + ' (' + path.split('?')[0] + '): ' + String(msg).slice(0, 200) + hint);
   }
   return JSON.parse(res.getContentText());
 }
@@ -507,6 +514,15 @@ function toast_(msg) {
 }
 
 /* ======================= LOGIC TÍNH TOÁN (thuần, có test) ======================= */
+
+/** Bỏ khoảng trắng, dấu ngoặc, ký tự ẩn do copy/paste. */
+function cleanApiKey(v) {
+  return String(v || '').replace(/[\s\u200B-\u200D\uFEFF"'`]/g, '');
+}
+
+function maskKey(key) {
+  return key.length + ' ký tự, kết thúc bằng "…' + key.slice(-4) + '"';
+}
 
 function normHeader(h) { return String(h || '').trim().toLowerCase().replace(/\s+/g, ' '); }
 function normCode(v) { return String(v == null ? '' : v).trim().toUpperCase(); }
