@@ -58,7 +58,7 @@
   .lang button { background: none; border: 0; color: var(--cream); padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
   .lang button.on { background: var(--cream); color: var(--navy); font-weight: 600; }
 
-  main { padding: 24px 0 48px; }
+  main.wrap { padding-top: 24px; padding-bottom: 48px; }
   section { background: var(--card); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; box-shadow: 0 1px 0 var(--line); }
   .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
   section h2 { font-size: 26px; }
@@ -95,7 +95,6 @@
   .seg button.on { background: var(--navy); color: var(--cream); }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
-  .legend .ref { width: 0; height: 12px; border-left: 2px dashed var(--red); border-radius: 0; }
   .bars { position: relative; }
   .bar-row { display: grid; grid-template-columns: minmax(90px, 32%) 1fr 92px; align-items: center; gap: 10px; padding: 3px 0; border-radius: 6px; cursor: default; }
   .bar-row:hover { background: var(--cream); }
@@ -103,7 +102,6 @@
   .bar-track { position: relative; height: 16px; }
   .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--blue); border-radius: 0 4px 4px 0; min-width: 2px; }
   .bar-fill.full { background: var(--teal); }
-  .bar-ref { position: absolute; top: -3px; bottom: -3px; border-left: 2px dashed var(--red); opacity: .55; pointer-events: none; }
   .bar-val { font-size: 13px; white-space: nowrap; }
   .bar-val b { font-weight: 600; }
   .bar-val span { color: var(--muted); font-size: 12px; }
@@ -188,14 +186,14 @@
       campaign: 'Chiến dịch', from: 'Bắt đầu', expectedEnd: 'Dự kiến chốt', updated: 'Cập nhật lúc',
       frozen: 'ĐÃ CHỐT KẾT QUẢ', frozenAt: 'Chốt lúc',
       kpiFull: 'Nhà hàng đạt 100%', kpiRate: 'Tỉ lệ hoàn thành toàn chuỗi', kpiPeople: 'Người đã hoàn thành',
-      boardTitle: 'Bảng vinh danh', boardSubLive: '3 nhà hàng đạt 100% sớm nhất, xếp theo thời điểm người cuối cùng hoàn thành',
+      boardTitle: 'Bảng vinh danh', boardSubLive: '3 nhà hàng có tỉ lệ hoàn thành cao nhất. Bằng tỉ lệ: nhà hàng có người cuối cùng hoàn thành sớm hơn xếp trên',
       boardSubFinal: 'Kết quả chung cuộc',
       waitingTitle: 'Đang chờ các Learning Champions lộ diện…',
-      waitingSub: 'Nhà hàng đầu tiên đạt 100% nhân viên hoàn thành sẽ xuất hiện tại đây.',
+      waitingSub: 'Ngay khi có nhân viên hoàn thành khóa học, bảng vinh danh sẽ xuất hiện tại đây.',
       waitingFinal: 'Không có nhà hàng nào đủ điều kiện vinh danh.',
       reached: 'Đạt 100% lúc', lastAt: 'Người cuối hoàn thành', rankEmpty: 'Còn trống',
       chartTitle: 'Tỉ lệ hoàn thành theo nhà hàng', chartSub: 'Tất cả nhà hàng trong danh sách',
-      sortPct: 'Theo %', sortName: 'Theo tên', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%', legendRef: 'Mốc 80%',
+      sortPct: 'Theo %', sortName: 'Theo tên', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%',
       staff: 'nhân viên', completedOf: 'hoàn thành', noLast: 'Chưa có ai hoàn thành',
       detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách học viên theo nhà hàng',
       restaurant: 'Nhà hàng', course: 'Khóa học', allCourses: 'Tất cả khóa học', status: 'Trạng thái', all: 'Tất cả',
@@ -220,14 +218,14 @@
       campaign: 'Campaign', from: 'Starts', expectedEnd: 'Expected close', updated: 'Updated',
       frozen: 'RESULTS FINALISED', frozenAt: 'Finalised',
       kpiFull: 'Restaurants at 100%', kpiRate: 'Chain-wide completion', kpiPeople: 'People completed',
-      boardTitle: 'Hall of Champions', boardSubLive: 'First 3 restaurants to reach 100%, ranked by when their last learner completed',
+      boardTitle: 'Hall of Champions', boardSubLive: 'Top 3 restaurants by completion rate. Ties go to the restaurant whose last learner finished earlier',
       boardSubFinal: 'Final results',
       waitingTitle: 'Waiting for our Learning Champions to emerge…',
-      waitingSub: 'The first restaurant with 100% completion will appear here.',
+      waitingSub: 'As soon as learners start completing the course, the podium will appear here.',
       waitingFinal: 'No restaurant qualified for the podium.',
       reached: 'Reached 100% at', lastAt: 'Last completion', rankEmpty: 'Open',
       chartTitle: 'Completion rate by restaurant', chartSub: 'All restaurants in the list',
-      sortPct: 'By %', sortName: 'By name', legendFull: 'Reached 100%', legendPart: 'Below 100%', legendRef: '80% mark',
+      sortPct: 'By %', sortName: 'By name', legendFull: 'Reached 100%', legendPart: 'Below 100%',
       staff: 'staff', completedOf: 'completed', noLast: 'No completions yet',
       detailTitle: 'Detailed progress', detailSub: 'Learners by restaurant',
       restaurant: 'Restaurant', course: 'Course', allCourses: 'All courses', status: 'Status', all: 'All',
@@ -336,12 +334,12 @@
       var full = r.total > 0 && r.completed === r.total;
       return '<div class="bar-row" data-i="' + d.restaurants.indexOf(r) + '">' +
         '<div class="bar-name" title="' + esc(r.name) + '">' + esc(r.name) + '</div>' +
-        '<div class="bar-track"><div class="bar-fill' + (full ? ' full' : '') + '" style="width:' + Math.min(100, r.pct) + '%"></div><div class="bar-ref" style="left:80%"></div></div>' +
+        '<div class="bar-track"><div class="bar-fill' + (full ? ' full' : '') + '" style="width:' + Math.min(100, r.pct) + '%"></div></div>' +
         '<div class="bar-val num"><b>' + (full ? '✓ ' : '') + fmtPct(r.pct) + '</b> <span>' + r.completed + '/' + r.total + '</span></div></div>';
     }).join('');
     return '<section><div class="sec-head"><div><h2>' + t('chartTitle') + '</h2><div class="sub">' + t('chartSub') + '</div></div>' +
       '<div class="seg" id="sortSeg"><button type="button" data-s="pct" class="' + (chartSort === 'pct' ? 'on' : '') + '">' + t('sortPct') + '</button><button type="button" data-s="name" class="' + (chartSort === 'name' ? 'on' : '') + '">' + t('sortName') + '</button></div></div>' +
-      '<div class="legend"><span><i style="background:var(--teal)"></i>' + t('legendFull') + '</span><span><i style="background:var(--blue)"></i>' + t('legendPart') + '</span><span><i class="ref"></i>' + t('legendRef') + '</span></div>' +
+      '<div class="legend"><span><i style="background:var(--teal)"></i>' + t('legendFull') + '</span><span><i style="background:var(--blue)"></i>' + t('legendPart') + '</span></div>' +
       '<div class="bars" id="bars">' + rows + '</div></section>';
   }
 

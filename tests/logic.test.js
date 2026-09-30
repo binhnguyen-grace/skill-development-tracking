@@ -29,27 +29,32 @@ const progress = [
   { code: 'D6', status: 'Completed', dateMs: null, courseId: '689' },    // Completed nhưng không có ngày → chưa tính
 ];
 
-let r = computeStats({ employees, restaurants, progress, courseIds: ['689'], finalMode: false, finalMinPct: 80 });
-eq(names(r), ['B', 'A']);
+let r = computeStats({ employees, restaurants, progress, courseIds: ['689'] });
+eq(names(r), ['B', 'A', 'D']);
 assert.strictEqual(r.warnings.unknownRestaurant, 1);
 assert.strictEqual(r.restaurants.find(x => x.name === 'D').pct, 83.3);
 assert.strictEqual(r.restaurants.find(x => x.name === 'E').total, 0);
 assert.strictEqual(r.details.C[0].status, '45%');
 
-// Chốt: thiếu hạng 3 → lấy D (83,3% > 80%)
-r = computeStats({ employees, restaurants, progress, courseIds: ['689'], finalMode: true, finalMinPct: 80 });
-eq(names(r), ['B', 'A', 'D']);
+// C (0%) và E (không có NV) không bao giờ lên bảng
+assert.ok(!JSON.parse(names(r)).includes('C'));
 
 // NV mới vào B chưa học → B rớt khỏi bảng; hoàn thành muộn → mốc B đổi
 const emp2 = employees.concat([emp('B3', 'B')]);
 r = computeStats({ employees: emp2, restaurants, progress, courseIds: ['689'] });
-eq(names(r), ['A']);
+eq(names(r), ['A', 'D', 'B']); // B còn 2/3 = 66,7%
 r = computeStats({ employees: emp2, restaurants, progress: progress.concat([done('B3', '10/10/2026 12:00')]), courseIds: ['689'] });
-eq(names(r), ['A', 'B']);
+eq(names(r), ['A', 'B', 'D']);
+
+// Bằng tỉ lệ → người cuối hoàn thành sớm hơn xếp trên
+r = computeStats({ employees: [emp('P1', 'D'), emp('Q1', 'E'), emp('Q2', 'E')].concat([emp('P2', 'D')]), restaurants,
+  progress: [done('P1', '09/10/2026 10:00'), done('Q1', '08/10/2026 10:00')], courseIds: ['689'] });
+eq(names(r), ['E', 'D']);
 
 // Nhiều khóa: phải hoàn thành tất cả
 r = computeStats({ employees, restaurants, progress, courseIds: ['689', '701'] });
 assert.strictEqual(r.leaderboard.length, 0);
+assert.strictEqual(r.totals.completed, 0);
 r = computeStats({ employees, restaurants, courseIds: ['689', '701'],
   progress: progress.concat([done('A1', '09/10/2026 08:00', '701'), done('A2', '06/10/2026 08:00', '701')]) });
 eq(names(r), ['A']);
@@ -59,6 +64,6 @@ assert.strictEqual(r.details.B.find(x => x.courseId === '701').status, 'Not enro
 
 // Sheet cũ không có cột Course ID + chỉ 1 khóa → vẫn khớp
 r = computeStats({ employees, restaurants, courseIds: ['689'], progress: progress.map(p => ({ ...p, courseId: '' })) });
-eq(names(r), ['B', 'A']);
+eq(names(r), ['B', 'A', 'D']);
 
 console.log('All tests passed');

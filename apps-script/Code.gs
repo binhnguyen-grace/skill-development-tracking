@@ -27,7 +27,6 @@ var CONFIG_DEFAULTS = [
   ['Course IDs', '689', 'Mã khóa học TalentLMS. Nhiều khóa: cách nhau bằng dấu phẩy, VD: 689, 701'],
   ['TalentLMS Domain', 'pizza4ps.talentlms.com', 'Tên miền TalentLMS'],
   ['Employee Code Field', 'PZ Code', 'Tên custom field chứa mã nhân viên. Nếu trống sẽ dùng Username'],
-  ['Final Min %', '80', 'Khi chốt mà < 3 nhà hàng đạt 100%: lấy thêm nhà hàng có tỉ lệ LỚN HƠN mức này'],
   ['Admin Emails', '', 'Email admin (được bấm Chốt/Sync). Chủ sở hữu script luôn là admin. Nhiều email cách nhau bằng dấu phẩy']
 ];
 var SNAPSHOT_CHUNK = 40000;   // ký tự / ô trong sheet (giới hạn 50.000)
@@ -306,7 +305,7 @@ function buildSnapshot() {
 
   var result = computeStats({
     employees: employees, restaurants: restaurants, progress: progress,
-    courseIds: cfg.courseIds, finalMode: frozen, finalMinPct: cfg.finalMinPct
+    courseIds: cfg.courseIds
   });
 
   var snap = {
@@ -467,7 +466,6 @@ function readConfig_() {
     courseIds: String(get('Course IDs')).split(/[,;\s]+/).map(function (s) { return s.trim(); }).filter(Boolean),
     domain: String(get('TalentLMS Domain')).replace(/^https?:\/\//, '').replace(/\/.*$/, '').trim(),
     codeField: String(get('Employee Code Field')).trim(),
-    finalMinPct: Number(get('Final Min %')) || 80,
     adminEmails: splitEmails(get('Admin Emails'))
   };
 }
@@ -556,9 +554,8 @@ function displayStatus(status) {
  * Tính tỉ lệ hoàn thành & bảng xếp hạng.
  * - Nhân viên hoàn thành = hoàn thành TẤT CẢ khóa trong courseIds (status Completed + có ngày).
  * - Mốc của nhà hàng = thời điểm hoàn thành muộn nhất trong số nhân viên đã hoàn thành.
- * - Live: chỉ nhà hàng đạt 100%, sớm hơn xếp trên.
- * - Final (đã chốt): nếu < 3 nhà hàng 100%, lấy thêm nhà hàng có % > finalMinPct
- *   (% cao hơn xếp trên, bằng % thì mốc sớm hơn xếp trên).
+ * - Top 3 = tỉ lệ hoàn thành cao nhất; bằng tỉ lệ thì mốc sớm hơn xếp trên.
+ *   Nhà hàng chưa có ai hoàn thành (0%) không lên bảng.
  */
 function computeStats(input) {
   var courseIds = (input.courseIds || []).map(String);
@@ -631,15 +628,10 @@ function computeStats(input) {
     var tb = b.lastCompletion === null ? Infinity : b.lastCompletion;
     return ta - tb || a.name.localeCompare(b.name);
   };
-  var full = restaurants.filter(function (r) { return r.total > 0 && r.completed === r.total; }).sort(byTime);
-  var board = full.slice(0, 3);
-  if (input.finalMode && board.length < 3) {
-    var minPct = input.finalMinPct == null ? 80 : input.finalMinPct;
-    var rest = restaurants.filter(function (r) {
-      return r.total > 0 && r.completed < r.total && (r.completed / r.total) * 100 > minPct;
-    }).sort(function (a, b) { return (b.completed / b.total) - (a.completed / a.total) || byTime(a, b); });
-    board = board.concat(rest.slice(0, 3 - board.length));
-  }
+  var full = restaurants.filter(function (r) { return r.total > 0 && r.completed === r.total; });
+  var board = restaurants.filter(function (r) { return r.total > 0 && r.completed > 0; })
+    .sort(function (a, b) { return (b.completed / b.total) - (a.completed / a.total) || byTime(a, b); })
+    .slice(0, 3);
 
   return {
     courses: courseIds.map(function (id) { return { id: id, name: courseNames[id] || ('Course ' + id) }; }),
