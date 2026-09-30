@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Serif:opsz,wdth,wght@8..144,50..150,300..700&display=swap" rel="stylesheet">
+<?!= include('Logos'); ?>
+<style>
+  :root {
+    /* Pizza 4P's brand palette */
+    --navy: #242E52;      /* Blue 1 */
+    --blue: #02499D;      /* Blue 2 */
+    --red: #F75B37;       /* Red 1 */
+    --red-dark: #842E14;  /* Red 2 */
+    --gold: #FFF382;      /* Yellow 1 */
+    --bronze: #BF6B21;    /* Yellow 2 */
+    --sand: #DDD6C5;      /* Grey 1 */
+    --cream: #F4F2EF;     /* Grey 2 */
+    --teal: #5FA395;      /* Teal 1 */
+    --teal-dark: #28473D; /* Teal 2 */
+    --green-soft: #CCFBCB;/* Green 2 */
+    --ink: #242E52;
+    --muted: #5E6479;
+    --line: #E4DFD3;
+    --card: #FFFFFF;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Roboto Serif', 'Century Schoolbook', Georgia, serif;
+    font-stretch: 85%;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-weight: 300; font-stretch: 62.5%; margin: 0; letter-spacing: .01em; }
+  .num { font-variant-numeric: tabular-nums; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* Header */
+  header { background: var(--navy); color: var(--cream); padding: 20px 0 26px; }
+  .head-row { display: flex; align-items: center; gap: 16px; }
+  .logo { width: 64px; height: auto; flex: none; }
+  .titles { flex: 1; min-width: 0; }
+  .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+  header h1 { font-size: clamp(26px, 5vw, 40px); line-height: 1.1; }
+  .meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; opacity: .9; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(244,242,239,.12); }
+  .pill.frozen { background: var(--red); color: #fff; font-weight: 600; }
+  .lang { display: flex; border: 1px solid rgba(244,242,239,.4); border-radius: 999px; overflow: hidden; flex: none; }
+  .lang button { background: none; border: 0; color: var(--cream); padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .lang button.on { background: var(--cream); color: var(--navy); font-weight: 600; }
+
+  main { padding: 24px 0 48px; }
+  section { background: var(--card); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; box-shadow: 0 1px 0 var(--line); }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  section h2 { font-size: 26px; }
+  .sub { color: var(--muted); font-size: 13px; }
+
+  /* KPI */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--line); }
+  .kpi .v { font-size: 30px; font-weight: 300; font-stretch: 62.5%; line-height: 1.1; }
+  .kpi .l { font-size: 12px; color: var(--muted); }
+
+  /* Podium */
+  .podium { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 14px; align-items: end; }
+  .place { border-radius: var(--radius); padding: 18px 16px; text-align: center; background: var(--cream); position: relative; }
+  .place.r1 { order: 2; padding-top: 30px; padding-bottom: 30px; background: var(--navy); color: var(--cream); }
+  .place.r2 { order: 1; }
+  .place.r3 { order: 3; }
+  .medal { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 10px; font-size: 22px; font-weight: 600; font-stretch: 75%; }
+  .r1 .medal { background: var(--gold); color: var(--navy); width: 60px; height: 60px; font-size: 28px; }
+  .r2 .medal { background: var(--sand); color: var(--navy); }
+  .r3 .medal { background: var(--bronze); color: #fff; }
+  .place .rname { font-size: 22px; font-weight: 300; font-stretch: 62.5%; line-height: 1.15; word-break: break-word; }
+  .r1 .rname { font-size: 28px; }
+  .place .rstat { font-size: 13px; margin-top: 6px; opacity: .85; }
+  .place.empty { opacity: .45; }
+  .waiting { text-align: center; padding: 34px 16px; background: var(--cream); border-radius: var(--radius); }
+  .waiting img { width: 72px; opacity: .9; }
+  .waiting h3 { font-size: 26px; margin: 10px 0 4px; }
+
+  /* Chart */
+  .chart-tools { display: flex; gap: 6px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .seg button { border: 0; background: none; font: inherit; font-size: 12px; padding: 5px 12px; cursor: pointer; color: var(--muted); }
+  .seg button.on { background: var(--navy); color: var(--cream); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+  .legend .ref { width: 0; height: 12px; border-left: 2px dashed var(--red); border-radius: 0; }
+  .bars { position: relative; }
+  .bar-row { display: grid; grid-template-columns: minmax(90px, 32%) 1fr 92px; align-items: center; gap: 10px; padding: 3px 0; border-radius: 6px; cursor: default; }
+  .bar-row:hover { background: var(--cream); }
+  .bar-name { font-size: 13px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { position: relative; height: 16px; }
+  .bar-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--blue); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .bar-fill.full { background: var(--teal); }
+  .bar-ref { position: absolute; top: -3px; bottom: -3px; border-left: 2px dashed var(--red); opacity: .55; pointer-events: none; }
+  .bar-val { font-size: 13px; white-space: nowrap; }
+  .bar-val b { font-weight: 600; }
+  .bar-val span { color: var(--muted); font-size: 12px; }
+  .tip { position: fixed; z-index: 10; pointer-events: none; background: var(--navy); color: var(--cream); font-size: 12px; padding: 8px 10px; border-radius: 8px; max-width: 260px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+
+  /* Detail */
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); flex: 1 1 200px; }
+  select, input[type=search] { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 10px; border: 1px solid var(--sand); border-radius: 10px; background: #fff; width: 100%; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--cream); }
+  .chip b { font-weight: 600; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { background: var(--cream); font-weight: 600; font-size: 12px; position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  .st { display: inline-flex; align-items: center; gap: 6px; }
+  .st::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--sand); }
+  .st.done::before { background: var(--teal); }
+  .st.prog::before { background: var(--gold); box-shadow: inset 0 0 0 1px var(--bronze); }
+  .st.none::before { background: var(--red); }
+  .locked { text-align: center; padding: 26px 16px; color: var(--muted); background: var(--cream); border-radius: var(--radius); }
+
+  /* Admin */
+  .admin { border: 2px dashed var(--sand); background: #fff; }
+  .admin-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
+  .btn { font: inherit; font-size: 14px; padding: 9px 16px; border-radius: 10px; border: 1px solid var(--navy); background: #fff; color: var(--navy); cursor: pointer; }
+  .btn.primary { background: var(--navy); color: var(--cream); }
+  .btn.danger { background: var(--red); border-color: var(--red); color: #fff; }
+  .btn:disabled { opacity: .5; cursor: wait; }
+  .admin-info { font-size: 13px; color: var(--muted); display: grid; gap: 4px; }
+  .err { color: var(--red-dark); }
+
+  .loading { text-align: center; padding: 80px 16px; color: var(--muted); }
+  footer { text-align: center; font-size: 12px; color: var(--muted); padding-bottom: 32px; }
+
+  @media (max-width: 720px) {
+    header { padding: 16px 0 20px; }
+    .logo { width: 48px; }
+    section { padding: 16px; }
+    .kpis { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .kpi { padding: 12px 10px; }
+    .kpi .v { font-size: 22px; }
+    .podium { grid-template-columns: 1fr; }
+    .place.r1, .place.r2, .place.r3 { order: 0; padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 0 14px; text-align: left; align-items: center; }
+    .place .medal { margin: 0; grid-row: span 2; }
+    .r1 .rname, .place .rname { font-size: 22px; }
+    .bar-row { grid-template-columns: minmax(80px, 34%) 1fr 74px; gap: 8px; }
+    .bar-val span { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="head-row">
+      <img class="logo" id="logo" alt="Pizza 4P's">
+      <div class="titles">
+        <div class="eyebrow">Pizza 4P's · Learning &amp; Development</div>
+        <h1 id="title">Learning Champion</h1>
+      </div>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="vi">VI</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+    <div class="meta" id="meta"></div>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <div class="loading" id="loading">…</div>
+</main>
+<div class="tip" id="tip"></div>
+<footer class="wrap" id="footer"></footer>
+
+<script>
+  var I18N = {
+    vi: {
+      loading: 'Đang tải dữ liệu…',
+      campaign: 'Chiến dịch', from: 'Bắt đầu', expectedEnd: 'Dự kiến chốt', updated: 'Cập nhật lúc',
+      frozen: 'ĐÃ CHỐT KẾT QUẢ', frozenAt: 'Chốt lúc',
+      kpiFull: 'Nhà hàng đạt 100%', kpiRate: 'Tỉ lệ hoàn thành toàn chuỗi', kpiPeople: 'Người đã hoàn thành',
+      boardTitle: 'Bảng vinh danh', boardSubLive: '3 nhà hàng đạt 100% sớm nhất, xếp theo thời điểm người cuối cùng hoàn thành',
+      boardSubFinal: 'Kết quả chung cuộc',
+      waitingTitle: 'Đang chờ các Learning Champions lộ diện…',
+      waitingSub: 'Nhà hàng đầu tiên đạt 100% nhân viên hoàn thành sẽ xuất hiện tại đây.',
+      waitingFinal: 'Không có nhà hàng nào đủ điều kiện vinh danh.',
+      reached: 'Đạt 100% lúc', lastAt: 'Người cuối hoàn thành', rankEmpty: 'Còn trống',
+      chartTitle: 'Tỉ lệ hoàn thành theo nhà hàng', chartSub: 'Tất cả nhà hàng trong danh sách',
+      sortPct: 'Theo %', sortName: 'Theo tên', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%', legendRef: 'Mốc 80%',
+      staff: 'nhân viên', completedOf: 'hoàn thành', noLast: 'Chưa có ai hoàn thành',
+      detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách học viên theo nhà hàng',
+      restaurant: 'Nhà hàng', course: 'Khóa học', allCourses: 'Tất cả khóa học', status: 'Trạng thái', all: 'Tất cả',
+      stDone: 'Đã hoàn thành', stNot: 'Chưa hoàn thành', search: 'Tìm theo mã / tên', choose: '— Chọn nhà hàng —',
+      cCode: 'Mã NV', cName: 'Họ tên', cFunc: 'Function', cCourse: 'Khóa học', cStatus: 'Progress Status', cDate: 'Completion Date',
+      locked: 'Phần chi tiết chỉ hiển thị cho Restaurant Manager của nhà hàng và ban quản lý.',
+      noRows: 'Không có dữ liệu phù hợp.', rows: 'dòng',
+      adminTitle: 'Khu vực Admin', adminSub: 'Chỉ admin nhìn thấy khu vực này',
+      aPull: 'Lấy dữ liệu TalentLMS ngay', aSync: 'Sync lại dữ liệu từ sheet', aFreeze: 'Chốt bảng xếp hạng', aUnfreeze: 'Mở chốt',
+      cPull: 'Lấy dữ liệu mới nhất từ TalentLMS vào sheet? (Nếu đang chốt, dashboard sẽ KHÔNG đổi.)',
+      cSync: 'Cập nhật dashboard theo dữ liệu hiện tại trong sheet?',
+      cFreeze: 'Chốt bảng xếp hạng theo dữ liệu hiện tại? Sau khi chốt, dashboard sẽ không tự cập nhật mỗi sáng nữa.',
+      cUnfreeze: 'Mở chốt? Dashboard sẽ tự cập nhật lại mỗi sáng.',
+      lastPull: 'Lần lấy TalentLMS gần nhất', lastErr: 'Lỗi gần nhất', warn: 'Cảnh báo dữ liệu',
+      wUnknown: 'NV có nhà hàng không nằm trong Restaurant list', wDup: 'Mã NV bị trùng trong Detailed list', wNotIn: 'Mã NV trên LMS không có trong Detailed list',
+      done: 'Đã xong!', error: 'Có lỗi xảy ra', noAccess: 'Bạn không có quyền xem chi tiết nhà hàng này.',
+      footer: 'Dữ liệu nội bộ Pizza 4P\'s — vui lòng không chia sẻ ra bên ngoài.',
+      stMap: { 'Completed': 'Hoàn thành', 'Not started': 'Chưa bắt đầu', 'Not enrolled': 'Chưa ghi danh' }
+    },
+    en: {
+      loading: 'Loading data…',
+      campaign: 'Campaign', from: 'Starts', expectedEnd: 'Expected close', updated: 'Updated',
+      frozen: 'RESULTS FINALISED', frozenAt: 'Finalised',
+      kpiFull: 'Restaurants at 100%', kpiRate: 'Chain-wide completion', kpiPeople: 'People completed',
+      boardTitle: 'Hall of Champions', boardSubLive: 'First 3 restaurants to reach 100%, ranked by when their last learner completed',
+      boardSubFinal: 'Final results',
+      waitingTitle: 'Waiting for our Learning Champions to emerge…',
+      waitingSub: 'The first restaurant with 100% completion will appear here.',
+      waitingFinal: 'No restaurant qualified for the podium.',
+      reached: 'Reached 100% at', lastAt: 'Last completion', rankEmpty: 'Open',
+      chartTitle: 'Completion rate by restaurant', chartSub: 'All restaurants in the list',
+      sortPct: 'By %', sortName: 'By name', legendFull: 'Reached 100%', legendPart: 'Below 100%', legendRef: '80% mark',
+      staff: 'staff', completedOf: 'completed', noLast: 'No completions yet',
+      detailTitle: 'Detailed progress', detailSub: 'Learners by restaurant',
+      restaurant: 'Restaurant', course: 'Course', allCourses: 'All courses', status: 'Status', all: 'All',
+      stDone: 'Completed', stNot: 'Not completed', search: 'Search code / name', choose: '— Select a restaurant —',
+      cCode: 'EmployeeCode', cName: 'EmployeeName', cFunc: 'Function', cCourse: 'Course', cStatus: 'Progress Status', cDate: 'Completion Date',
+      locked: 'Details are visible only to the restaurant\'s Restaurant Manager and management.',
+      noRows: 'No matching rows.', rows: 'rows',
+      adminTitle: 'Admin area', adminSub: 'Only admins can see this',
+      aPull: 'Pull TalentLMS data now', aSync: 'Re-sync from sheet', aFreeze: 'Finalise leaderboard', aUnfreeze: 'Unfreeze',
+      cPull: 'Pull the latest TalentLMS data into the sheet? (If finalised, the dashboard will NOT change.)',
+      cSync: 'Update the dashboard from the current sheet data?',
+      cFreeze: 'Finalise the leaderboard with current data? The dashboard will stop auto-updating each morning.',
+      cUnfreeze: 'Unfreeze? The dashboard will auto-update every morning again.',
+      lastPull: 'Last TalentLMS pull', lastErr: 'Last error', warn: 'Data warnings',
+      wUnknown: 'Staff whose restaurant is not in Restaurant list', wDup: 'Duplicate codes in Detailed list', wNotIn: 'LMS codes not in Detailed list',
+      done: 'Done!', error: 'Something went wrong', noAccess: 'You don\'t have access to this restaurant\'s details.',
+      footer: 'Pizza 4P\'s internal data — please do not share externally.',
+      stMap: {}
+    }
+  };
+
+  var lang = 'vi';
+  try { lang = localStorage.getItem('lc_lang') || 'vi'; } catch (e) {}
+  var DATA = null;
+  var chartSort = 'pct';
+  var detailCache = {};
+  var detailState = { restaurant: '', course: '', status: '', q: '' };
+
+  function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.vi[k] || k; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtDate(ms, withTime) {
+    if (!ms) return '';
+    var o = { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric' };
+    if (withTime) { o.hour = '2-digit'; o.minute = '2-digit'; o.hour12 = false; }
+    return new Date(ms).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-GB', o);
+  }
+  function fmtPct(p) { return (Math.round(p * 10) / 10).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-GB') + '%'; }
+  function stLabel(s) { return (I18N[lang].stMap && I18N[lang].stMap[s]) || s; }
+  function courseName(id) {
+    var c = (DATA.courses || []).filter(function (x) { return x.id === id; })[0];
+    return c ? c.name : id;
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang button').forEach(function (b) { b.classList.toggle('on', b.dataset.lang === lang); });
+    document.getElementById('footer').textContent = t('footer');
+    if (!DATA) { document.getElementById('loading').textContent = t('loading'); return; }
+
+    var d = DATA;
+    document.getElementById('title').textContent = d.campaign.name || 'Learning Champion';
+    var meta = [];
+    if (d.campaign.start) meta.push('<span>' + t('from') + ': <b class="num">' + fmtDate(d.campaign.start) + '</b></span>');
+    if (d.campaign.expectedEnd) meta.push('<span>' + t('expectedEnd') + ': <b class="num">' + fmtDate(d.campaign.expectedEnd) + '</b></span>');
+    meta.push('<span class="pill num">' + t('updated') + ' ' + fmtDate(d.generatedAt, true) + '</span>');
+    if (d.frozen) meta.push('<span class="pill frozen">🔒 ' + t('frozen') + (d.frozenAt ? ' · ' + fmtDate(d.frozenAt, true) : '') + '</span>');
+    document.getElementById('meta').innerHTML = meta.join('');
+
+    var html = '';
+    html += renderKpis(d);
+    html += renderBoard(d);
+    html += renderChart(d);
+    html += renderDetailShell(d);
+    if (d.viewer.isAdmin) html += renderAdmin(d);
+    document.getElementById('app').innerHTML = html;
+    bindChart();
+    bindDetail();
+    bindAdmin();
+  }
+
+  function renderKpis(d) {
+    var rate = d.totals.employees ? d.totals.completed / d.totals.employees * 100 : 0;
+    return '<div class="kpis">' +
+      '<div class="kpi"><div class="v num">' + d.totals.fullRestaurants + '<span style="font-size:.55em;opacity:.6"> / ' + d.totals.restaurants + '</span></div><div class="l">' + t('kpiFull') + '</div></div>' +
+      '<div class="kpi"><div class="v num">' + fmtPct(rate) + '</div><div class="l">' + t('kpiRate') + '</div></div>' +
+      '<div class="kpi"><div class="v num">' + d.totals.completed.toLocaleString() + '<span style="font-size:.55em;opacity:.6"> / ' + d.totals.employees.toLocaleString() + '</span></div><div class="l">' + t('kpiPeople') + '</div></div>' +
+      '</div>';
+  }
+
+  function renderBoard(d) {
+    var head = '<div class="sec-head"><div><h2>🏆 ' + t('boardTitle') + '</h2><div class="sub">' + (d.mode === 'final' ? t('boardSubFinal') : t('boardSubLive')) + '</div></div></div>';
+    if (!d.leaderboard.length) {
+      return '<section>' + head + '<div class="waiting"><img src="' + window.LOGOS.navy + '" alt=""><h3>' + (d.mode === 'final' ? t('waitingFinal') : t('waitingTitle')) + '</h3>' +
+        (d.mode === 'final' ? '' : '<div class="sub">' + t('waitingSub') + '</div>') + '</div></section>';
+    }
+    var cells = '';
+    for (var i = 1; i <= 3; i++) {
+      var r = d.leaderboard[i - 1];
+      if (!r) { cells += '<div class="place r' + i + ' empty"><div class="medal">' + i + '</div><div class="rname">' + t('rankEmpty') + '</div><div class="rstat">&nbsp;</div></div>'; continue; }
+      var full = r.completed === r.total;
+      var stat = full
+        ? t('reached') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>'
+        : '<span class="num">' + fmtPct(r.pct) + ' · ' + r.completed + '/' + r.total + '</span>' + (r.lastCompletion ? '<br>' + t('lastAt') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>' : '');
+      cells += '<div class="place r' + i + '"><div class="medal">' + i + '</div><div class="rname">' + esc(r.name) + '</div><div class="rstat">' +
+        (full ? '<b class="num">100% · ' + r.total + ' ' + t('staff') + '</b><br>' : '') + stat + '</div></div>';
+    }
+    return '<section>' + head + '<div class="podium">' + cells + '</div></section>';
+  }
+
+  function renderChart(d) {
+    var list = d.restaurants.slice();
+    if (chartSort === 'pct') list.sort(function (a, b) { return b.pct - a.pct || (a.lastCompletion || Infinity) - (b.lastCompletion || Infinity) || a.name.localeCompare(b.name); });
+    else list.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    var rows = list.map(function (r, i) {
+      var full = r.total > 0 && r.completed === r.total;
+      return '<div class="bar-row" data-i="' + d.restaurants.indexOf(r) + '">' +
+        '<div class="bar-name" title="' + esc(r.name) + '">' + esc(r.name) + '</div>' +
+        '<div class="bar-track"><div class="bar-fill' + (full ? ' full' : '') + '" style="width:' + Math.min(100, r.pct) + '%"></div><div class="bar-ref" style="left:80%"></div></div>' +
+        '<div class="bar-val num"><b>' + (full ? '✓ ' : '') + fmtPct(r.pct) + '</b> <span>' + r.completed + '/' + r.total + '</span></div></div>';
+    }).join('');
+    return '<section><div class="sec-head"><div><h2>' + t('chartTitle') + '</h2><div class="sub">' + t('chartSub') + '</div></div>' +
+      '<div class="seg" id="sortSeg"><button type="button" data-s="pct" class="' + (chartSort === 'pct' ? 'on' : '') + '">' + t('sortPct') + '</button><button type="button" data-s="name" class="' + (chartSort === 'name' ? 'on' : '') + '">' + t('sortName') + '</button></div></div>' +
+      '<div class="legend"><span><i style="background:var(--teal)"></i>' + t('legendFull') + '</span><span><i style="background:var(--blue)"></i>' + t('legendPart') + '</span><span><i class="ref"></i>' + t('legendRef') + '</span></div>' +
+      '<div class="bars" id="bars">' + rows + '</div></section>';
+  }
+
+  function bindChart() {
+    var tip = document.getElementById('tip');
+    document.querySelectorAll('#sortSeg button').forEach(function (b) {
+      b.onclick = function () { chartSort = b.dataset.s; render(); };
+    });
+    document.querySelectorAll('.bar-row').forEach(function (row) {
+      row.onmousemove = function (ev) {
+        var r = DATA.restaurants[+row.dataset.i];
+        tip.innerHTML = '<b>' + esc(r.name) + '</b><br>' + fmtPct(r.pct) + ' · ' + r.completed + '/' + r.total + ' ' + t('completedOf') +
+          '<br>' + (r.lastCompletion ? t('lastAt') + ': ' + fmtDate(r.lastCompletion, true) : t('noLast'));
+        tip.style.display = 'block';
+        var x = Math.min(ev.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+        tip.style.left = x + 'px'; tip.style.top = (ev.clientY + 14) + 'px';
+      };
+      row.onmouseleave = function () { tip.style.display = 'none'; };
+    });
+  }
+
+  function renderDetailShell(d) {
+    var head = '<div class="sec-head"><div><h2>' + t('detailTitle') + '</h2><div class="sub">' + t('detailSub') + '</div></div></div>';
+    if (!d.detailRestaurants.length) return '<section>' + head + '<div class="locked">🔒 ' + t('locked') + '</div></section>';
+    if (!detailState.restaurant && d.detailRestaurants.length === 1) detailState.restaurant = d.detailRestaurants[0];
+    var rOpts = '<option value="">' + t('choose') + '</option>' + d.detailRestaurants.map(function (n) {
+      return '<option' + (n === detailState.restaurant ? ' selected' : '') + ' value="' + esc(n) + '">' + esc(n) + '</option>';
+    }).join('');
+    var cOpts = '<option value="">' + t('allCourses') + '</option>' + d.courses.map(function (c) {
+      return '<option' + (c.id === detailState.course ? ' selected' : '') + ' value="' + esc(c.id) + '">' + esc(c.name) + '</option>';
+    }).join('');
+    var sOpts = [['', t('all')], ['done', t('stDone')], ['not', t('stNot')]].map(function (o) {
+      return '<option' + (o[0] === detailState.status ? ' selected' : '') + ' value="' + o[0] + '">' + o[1] + '</option>';
+    }).join('');
+    return '<section>' + head +
+      '<div class="filters">' +
+      '<label>' + t('restaurant') + '<select id="fRest">' + rOpts + '</select></label>' +
+      (d.courses.length > 1 ? '<label>' + t('course') + '<select id="fCourse">' + cOpts + '</select></label>' : '') +
+      '<label>' + t('status') + '<select id="fStatus">' + sOpts + '</select></label>' +
+      '<label>' + t('search') + '<input type="search" id="fQ" value="' + esc(detailState.q) + '"></label>' +
+      '</div><div id="detailBody"></div></section>';
+  }
+
+  function bindDetail() {
+    var rest = document.getElementById('fRest');
+    if (!rest) return;
+    rest.onchange = function () { detailState.restaurant = rest.value; loadDetail(); };
+    var c = document.getElementById('fCourse');
+    if (c) c.onchange = function () { detailState.course = c.value; drawDetail(); };
+    document.getElementById('fStatus').onchange = function (e) { detailState.status = e.target.value; drawDetail(); };
+    document.getElementById('fQ').oninput = function (e) { detailState.q = e.target.value; drawDetail(); };
+    loadDetail();
+  }
+
+  function loadDetail() {
+    var name = detailState.restaurant;
+    var body = document.getElementById('detailBody');
+    if (!name) { body.innerHTML = ''; return; }
+    if (detailCache[name]) { drawDetail(); return; }
+    body.innerHTML = '<div class="sub">' + t('loading') + '</div>';
+    google.script.run
+      .withSuccessHandler(function (rows) { detailCache[name] = rows; if (detailState.restaurant === name) drawDetail(); })
+      .withFailureHandler(function (err) { body.innerHTML = '<div class="locked">' + (String(err && err.message).indexOf('NO_ACCESS') !== -1 ? t('noAccess') : t('error')) + '</div>'; })
+      .getRestaurantDetail(name);
+  }
+
+  function drawDetail() {
+    var body = document.getElementById('detailBody');
+    var rows = detailCache[detailState.restaurant];
+    if (!body || !rows) return;
+    var q = detailState.q.trim().toLowerCase();
+    var multi = DATA.courses.length > 1;
+    var list = rows.filter(function (r) {
+      if (detailState.course && r.courseId !== detailState.course) return false;
+      if (detailState.status === 'done' && !r.completed) return false;
+      if (detailState.status === 'not' && r.completed) return false;
+      if (q && (r.code + ' ' + r.name).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    var r = DATA.restaurants.filter(function (x) { return x.name === detailState.restaurant; })[0];
+    var chips = r ? '<div class="chips"><span class="chip num"><b>' + fmtPct(r.pct) + '</b> · ' + r.completed + '/' + r.total + ' ' + t('completedOf') + '</span>' +
+      '<span class="chip">' + (r.lastCompletion ? t('lastAt') + ': <b class="num">' + fmtDate(r.lastCompletion, true) + '</b>' : t('noLast')) + '</span>' +
+      '<span class="chip num">' + list.length + ' ' + t('rows') + '</span></div>' : '';
+    if (!list.length) { body.innerHTML = chips + '<div class="locked">' + t('noRows') + '</div>'; return; }
+    var trs = list.map(function (x) {
+      var cls = x.completed ? 'done' : (/^\d/.test(x.status) ? 'prog' : (x.status === 'Not enrolled' ? 'none' : ''));
+      return '<tr><td class="num">' + esc(x.code) + '</td><td>' + esc(x.name) + '</td><td>' + esc(x.func) + '</td>' +
+        (multi ? '<td>' + esc(courseName(x.courseId)) + '</td>' : '') +
+        '<td><span class="st ' + cls + '">' + esc(stLabel(x.status)) + '</span></td><td class="num">' + (x.completed ? fmtDate(x.date, true) : '') + '</td></tr>';
+    }).join('');
+    body.innerHTML = chips + '<div class="table-wrap"><table><thead><tr><th>' + t('cCode') + '</th><th>' + t('cName') + '</th><th>' + t('cFunc') + '</th>' +
+      (multi ? '<th>' + t('cCourse') + '</th>' : '') + '<th>' + t('cStatus') + '</th><th>' + t('cDate') + '</th></tr></thead><tbody>' + trs + '</tbody></table></div>';
+  }
+
+  function renderAdmin(d) {
+    var a = d.admin || {};
+    var w = a.warnings || {};
+    var warns = [];
+    if (w.unknownRestaurant) warns.push(t('wUnknown') + ': <b>' + w.unknownRestaurant + '</b>');
+    if (w.duplicateEmployee) warns.push(t('wDup') + ': <b>' + w.duplicateEmployee + '</b>');
+    if (w.progressNotInList) warns.push(t('wNotIn') + ': <b>' + w.progressNotInList + '</b>');
+    return '<section class="admin"><div class="sec-head"><div><h2>⚙️ ' + t('adminTitle') + '</h2><div class="sub">' + t('adminSub') + '</div></div></div>' +
+      '<div class="admin-actions">' +
+      '<button class="btn" data-act="adminPullTalentLMS" data-c="cPull">' + t('aPull') + '</button>' +
+      '<button class="btn" data-act="adminSyncFromSheet" data-c="cSync">' + t('aSync') + '</button>' +
+      (d.frozen
+        ? '<button class="btn primary" data-act="adminUnfreeze" data-c="cUnfreeze">🔓 ' + t('aUnfreeze') + '</button>'
+        : '<button class="btn danger" data-act="adminFreeze" data-c="cFreeze">🔒 ' + t('aFreeze') + '</button>') +
+      '</div><div class="admin-info">' +
+      '<div>' + t('lastPull') + ': <b class="num">' + (a.lastPullAt ? fmtDate(a.lastPullAt, true) + ' (' + a.lastPullRows + ' ' + t('rows') + ')' : '—') + '</b></div>' +
+      (a.lastError ? '<div class="err">' + t('lastErr') + ': ' + esc(a.lastError) + '</div>' : '') +
+      (warns.length ? '<div>' + t('warn') + ': ' + warns.join(' · ') + '</div>' : '') +
+      '</div></section>';
+  }
+
+  function bindAdmin() {
+    document.querySelectorAll('[data-act]').forEach(function (btn) {
+      btn.onclick = function () {
+        if (!confirm(t(btn.dataset.c))) return;
+        document.querySelectorAll('[data-act]').forEach(function (b) { b.disabled = true; });
+        google.script.run
+          .withSuccessHandler(function () { detailCache = {}; alert(t('done')); load(); })
+          .withFailureHandler(function (err) { alert(t('error') + ': ' + (err && err.message)); load(); })[btn.dataset.act]();
+      };
+    });
+  }
+
+  function load() {
+    google.script.run
+      .withSuccessHandler(function (d) { DATA = d; render(); })
+      .withFailureHandler(function (err) {
+        document.getElementById('app').innerHTML = '<div class="loading err">' + t('error') + ': ' + esc(err && err.message) + '</div>';
+      })
+      .getDashboardData();
+  }
+
+  document.getElementById('logo').src = window.LOGOS.light;
+  document.querySelectorAll('.lang button').forEach(function (b) {
+    b.onclick = function () {
+      lang = b.dataset.lang;
+      try { localStorage.setItem('lc_lang', lang); } catch (e) {}
+      render();
+      if (DATA) { var body = document.getElementById('detailBody'); if (body) drawDetail(); }
+    };
+  });
+  render();
+  load();
+</script>
+</body>
+</html>
