@@ -12,7 +12,7 @@ Live link hiển thị bảng xếp hạng nhà hàng cho chiến dịch **Learn
 - [Tổng quan: hệ thống hoạt động thế nào](#tổng-quan)
 - [Bước 0 — Chuẩn bị Google Sheet](#bước-0--chuẩn-bị-google-sheet)
 - [Bước 1 — Mở Apps Script](#bước-1--mở-apps-script)
-- [Bước 2 — Dán code vào 3 file](#bước-2--dán-code-vào-3-file)
+- [Bước 2 — Dán code vào 4 file](#bước-2--dán-code-vào-4-file)
 - [Bước 3 — Chỉnh múi giờ dự án](#bước-3--chỉnh-múi-giờ-dự-án)
 - [Bước 4 — Chạy "Thiết lập ban đầu" & cấp quyền](#bước-4--chạy-thiết-lập-ban-đầu--cấp-quyền)
 - [Bước 5 — Kiểm tra sheet Config](#bước-5--kiểm-tra-sheet-config)
@@ -88,7 +88,7 @@ Sau khi chạy, sheet này có 6 cột: `EmployeeCode | EmployeeName | Progress 
 
 ---
 
-## Bước 2 — Dán code vào 3 file
+## Bước 2 — Dán code vào 4 file
 
 Code nằm trên GitHub, thư mục `apps-script/`:
 https://github.com/binhnguyen-grace/skill-development-tracking/tree/claude/pensive-goodall-41rmuj/apps-script
