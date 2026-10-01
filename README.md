@@ -46,12 +46,12 @@ TalentLMS ──(6h sáng mỗi ngày)──► sheet "LMS Learning Progress"
 
 **Ai thấy gì trên link:**
 
-| Người xem | Bảng vinh danh + Biểu đồ | Bảng chi tiết | Khu vực Admin |
-|---|---|---|---|
-| Mọi tài khoản @pizza4ps.com | ✅ | ❌ | ❌ |
-| Restaurant Manager | ✅ | ✅ chỉ nhà hàng của mình | ❌ |
-| Email trong sheet "Manager list" | ✅ | ✅ tất cả nhà hàng | ❌ |
-| Admin (bạn + email trong Config) | ✅ | ✅ tất cả | ✅ |
+| Người xem | Ô KPI (theo Area) | Bảng vinh danh + Biểu đồ (%) | Số partner hoàn thành/tổng | Bảng chi tiết | Khu vực Admin |
+|---|---|---|---|---|---|
+| Mọi tài khoản @pizza4ps.com | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Restaurant Manager | ❌ | ✅ | ❌ | ✅ chỉ nhà hàng của mình | ❌ |
+| Email trong sheet "Manager list" | ✅ | ✅ | ❌ | ✅ tất cả, lọc theo Area | ❌ |
+| Admin (chủ script + email trong Config) | ✅ | ✅ | ✅ | ✅ tất cả | ✅ |
 
 ---
 
@@ -66,6 +66,7 @@ Mở file Google Sheet của bạn và kiểm tra **tên sheet (tab ở dưới 
 **Sheet `Restaurant list`** — các cột:
 - `Restaurant` — tên phải **giống hệt** cột Restaurant ở Detailed list
 - `Store Code`
+- **Cột D = Area** (North / South / Central) — script đọc theo **vị trí cột D**, tên tiêu đề cột không quan trọng
 - `Restaurant Manager Email` — nếu 1 nhà hàng có 2 RM, ghi cả 2 email trong **cùng 1 ô**, cách nhau bằng dấu phẩy. Ví dụ: `rm1@pizza4ps.com, rm2@pizza4ps.com`
 
 **Sheet `Manager list`** — ghi email người được xem chi tiết tất cả nhà hàng vào cột **A, B hoặc C** (mỗi ô 1 email, dòng tiêu đề không sao).
@@ -108,10 +109,13 @@ https://github.com/binhnguyen-grace/skill-development-tracking/tree/claude/pensi
 ### 2c. File `Logos.html`
 Làm giống 2b, đặt tên `Logos`, dán nội dung file `Logos.html` (file này là 1 đoạn chữ rất dài — đó là hình logo đã mã hóa, bình thường).
 
+### 2c-2. File `Fonts.html`
+Làm giống 2b, đặt tên `Fonts`, dán nội dung file `Fonts.html`. (File này giữ chỗ cho font thương hiệu — khi có file font, chỉ cần dán đè nội dung mới.)
+
 ### 2d. Lưu
 Bấm biểu tượng **💾 Save project** (hoặc Ctrl + S).
 
-✅ Kết quả: cột Files có đúng 3 file `Code.gs`, `Index.html`, `Logos.html`. **Tên phải chính xác** (chữ I và L viết hoa).
+✅ Kết quả: cột Files có đúng 4 file `Code.gs`, `Index.html`, `Logos.html`, `Fonts.html`. **Tên phải chính xác** (chữ I và L viết hoa).
 
 ---
 
@@ -145,7 +149,7 @@ Mở tab **Config**. Cột A là tên cài đặt, **chỉ sửa cột B**:
 
 | Key | Giá trị mặc định | Ý nghĩa |
 |---|---|---|
-| Campaign Name | Learning Champion in October | Tiêu đề trên dashboard |
+| Campaign Name | Learning Champion | Tiêu đề trên dashboard |
 | Campaign Start | 05/10/2026 | Ngày bắt đầu (hiển thị) |
 | Expected End | 23/10/2026 | Ngày dự kiến chốt (chỉ hiển thị — chốt thật bằng nút Chốt) |
 | Course IDs | 689 | Mã khóa học TalentLMS. Nhiều khóa: `689, 701` |
@@ -296,6 +300,7 @@ apps-script/
   Code.gs        # Xử lý: TalentLMS, tính xếp hạng, phân quyền, Chốt/Sync
   Index.html     # Giao diện dashboard (VI/EN)
   Logos.html     # Logo Pizza 4P's (đã mã hóa)
+  Fonts.html     # Font thương hiệu (giữ chỗ, chưa có font)
 assets/          # Logo & bảng màu gốc
 docs/            # Ảnh xem trước (dữ liệu giả)
 tests/           # Kiểm tra logic xếp hạng: node tests/logic.test.js

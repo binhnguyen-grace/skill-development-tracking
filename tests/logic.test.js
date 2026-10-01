@@ -16,7 +16,7 @@ assert.strictEqual(T('2026-10-05'), Date.UTC(2026, 9, 4, 17, 0));
 assert.strictEqual(T(''), null);
 assert.strictEqual(T('abc'), null);
 
-const restaurants = ['A', 'B', 'C', 'D', 'E'].map(n => ({ name: n }));
+const restaurants = ['A', 'B', 'C', 'D', 'E'].map((n, i) => ({ name: n, area: ['North', 'South', 'North', 'Central', ''][i] }));
 const emp = (code, r) => ({ code, name: 'Emp ' + code, restaurant: r, func: 'Kitchen' });
 const done = (code, date, cid = '689') => ({ code, status: 'Completed', dateMs: T(date), courseId: cid });
 const employees = [emp('A1', 'A'), emp('A2', 'A'), emp('B1', 'B'), emp('B2', 'B'), emp('C1', 'C'),
@@ -35,6 +35,11 @@ assert.strictEqual(r.warnings.unknownRestaurant, 1);
 assert.strictEqual(r.restaurants.find(x => x.name === 'D').pct, 83.3);
 assert.strictEqual(r.restaurants.find(x => x.name === 'E').total, 0);
 assert.strictEqual(r.details.C[0].status, '45%');
+
+// Area: North = A(2/2)+C(0/1), thứ tự North, South, Central; E không có area
+assert.strictEqual(JSON.stringify(r.areas.map(a => [a.name, a.completed, a.total])), JSON.stringify([['North', 2, 3], ['South', 2, 2], ['Central', 5, 6]]));
+assert.strictEqual(JSON.stringify(r.warnings.noAreaRestaurants), JSON.stringify(['E']));
+assert.strictEqual(r.warnings.unknownRestaurantList[0].code, 'X1');
 
 // C (0%) và E (không có NV) không bao giờ lên bảng
 assert.ok(!JSON.parse(names(r)).includes('C'));

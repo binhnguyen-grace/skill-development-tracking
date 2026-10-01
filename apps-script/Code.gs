@@ -21,7 +21,7 @@ var SHEETS = {
 var TZ = 'Asia/Ho_Chi_Minh';
 var LMS_HEADERS = ['EmployeeCode', 'EmployeeName', 'Progress Status', 'Completion Date', 'Course', 'Course ID'];
 var CONFIG_DEFAULTS = [
-  ['Campaign Name', 'Learning Champion in October', 'Tên chiến dịch hiển thị trên dashboard'],
+  ['Campaign Name', 'Learning Champion', 'Tên chiến dịch hiển thị trên dashboard'],
   ['Campaign Start', '05/10/2026', 'Ngày bắt đầu (dd/mm/yyyy)'],
   ['Expected End', '23/10/2026', 'Ngày dự kiến chốt (dd/mm/yyyy) — chỉ để hiển thị, chốt thật bằng nút "Chốt"'],
   ['Course IDs', '689', 'Mã khóa học TalentLMS. Nhiều khóa: cách nhau bằng dấu phẩy, VD: 689, 701'],
@@ -58,11 +58,12 @@ function getDashboardData() {
     mode: snap.mode,
     campaign: snap.campaign,
     courses: snap.courses,
-    restaurants: snap.restaurants.map(function (r) {
-      return { name: r.name, total: r.total, completed: r.completed, pct: r.pct, lastCompletion: r.lastCompletion };
-    }),
-    leaderboard: snap.leaderboard,
-    totals: snap.totals,
+    // Số partner hoàn thành / tổng chỉ gửi cho admin; người khác chỉ thấy %
+    restaurants: snap.restaurants.map(function (r) { return publicRow_(r, access.isAdmin); }),
+    leaderboard: snap.leaderboard.map(function (r) { return publicRow_(r, access.isAdmin); }),
+    // Ô KPI chỉ dành cho Manager list (và admin)
+    totals: access.canViewAll ? snap.totals : null,
+    areas: access.canViewAll ? snap.areas : null,
     viewer: { email: email, isAdmin: access.isAdmin, canViewAll: access.canViewAll },
     detailRestaurants: access.canViewAll
       ? snap.restaurants.map(function (r) { return r.name; })
@@ -76,6 +77,24 @@ function getDashboardData() {
       warnings: snap.warnings
     };
   }
+  return out;
+}
+
+function publicRow_(r, withCounts) {
+  var o = { name: r.name, area: r.area || '', pct: r.pct, full: r.total > 0 && r.completed === r.total, lastCompletion: r.lastCompletion };
+  if (r.rank) o.rank = r.rank;
+  if (withCounts) { o.total = r.total; o.completed = r.completed; }
+  return o;
+}
+
+/** Chi tiết nhiều nhà hàng cùng lúc (lọc theo Area) — chỉ trả về nhà hàng người xem có quyền. */
+function getDetails(restaurants) {
+  var access = getAccess_(currentEmail_());
+  var snap = loadSnapshot_();
+  var out = {};
+  (restaurants || []).forEach(function (name) {
+    if (access.canViewAll || access.restaurants.indexOf(name) !== -1) out[name] = snap.details[name] || [];
+  });
   return out;
 }
 
@@ -303,7 +322,9 @@ function buildSnapshot() {
       restaurant: String(r.restaurant || '').trim(), func: String(r['function'] || '').trim() };
   });
   var restaurants = readTable_(SHEETS.RESTAURANTS, ['restaurant']).map(function (r) {
-    return { name: String(r.restaurant || '').trim(), storeCode: String(r['store code'] || '').trim() };
+    // Area lấy theo cột D của sheet Restaurant list
+    return { name: String(r.restaurant || '').trim(), storeCode: String(r['store code'] || '').trim(),
+      area: String(r._cols[3] == null ? '' : r._cols[3]).trim() };
   });
   var progress = readTable_(SHEETS.LMS, ['employeecode', 'progress status', 'completion date']).map(function (r) {
     return { code: normCode(r.employeecode), status: r['progress status'], dateMs: parseDateTime(r['completion date']),
@@ -325,6 +346,7 @@ function buildSnapshot() {
     restaurants: result.restaurants,
     leaderboard: result.leaderboard,
     totals: result.totals,
+    areas: result.areas,
     details: result.details,
     warnings: result.warnings
   };
@@ -488,7 +510,7 @@ function readTable_(name, required) {
     if (headers.indexOf(h) === -1) throw new Error('Sheet "' + name + '" thiếu cột "' + h + '"');
   });
   return values.slice(1).map(function (row) {
-    var o = {};
+    var o = { _cols: row };
     headers.forEach(function (h, i) { if (h) o[h] = row[i]; });
     return o;
   });
@@ -576,7 +598,9 @@ function displayStatus(status) {
 function computeStats(input) {
   var courseIds = (input.courseIds || []).map(String);
   var singleCourse = courseIds.length === 1 ? courseIds[0] : null;
-  var warnings = { unknownRestaurant: 0, duplicateEmployee: 0, progressNotInList: 0 };
+  var warnings = { unknownRestaurant: 0, duplicateEmployee: 0, progressNotInList: 0,
+    unknownRestaurantList: [], progressNotInListList: [], noAreaRestaurants: [] };
+  var LIST_CAP = 300;
 
   var courseNames = {};
   var prog = {}; // code -> courseId -> row
@@ -595,7 +619,7 @@ function computeStats(input) {
   var restaurants = [];
   input.restaurants.forEach(function (r) {
     if (!r.name || byName[r.name]) return;
-    byName[r.name] = { name: r.name, storeCode: r.storeCode || '', total: 0, completed: 0, pct: 0, lastCompletion: null };
+    byName[r.name] = { name: r.name, storeCode: r.storeCode || '', area: r.area || '', total: 0, completed: 0, pct: 0, lastCompletion: null };
     restaurants.push(byName[r.name]);
   });
 
@@ -609,7 +633,11 @@ function computeStats(input) {
     if (seen[e.code]) { warnings.duplicateEmployee++; return; }
     seen[e.code] = true;
     var r = byName[e.restaurant];
-    if (!r) { warnings.unknownRestaurant++; return; }
+    if (!r) {
+      warnings.unknownRestaurant++;
+      if (warnings.unknownRestaurantList.length < LIST_CAP) warnings.unknownRestaurantList.push({ code: e.code, restaurant: e.restaurant });
+      return;
+    }
 
     var done = courseIds.length > 0;
     var finishedAt = null;
@@ -633,7 +661,28 @@ function computeStats(input) {
     }
   });
 
-  Object.keys(prog).forEach(function (code) { if (!seen[code]) warnings.progressNotInList++; });
+  Object.keys(prog).forEach(function (code) {
+    if (seen[code]) return;
+    warnings.progressNotInList++;
+    if (warnings.progressNotInListList.length < LIST_CAP) warnings.progressNotInListList.push(code);
+  });
+
+  // Tỉ lệ theo Area (thứ tự: North, South, Central, rồi các area khác)
+  var AREA_ORDER = ['north', 'south', 'central'];
+  var areaMap = {};
+  restaurants.forEach(function (r) {
+    if (!r.area) { warnings.noAreaRestaurants.push(r.name); return; }
+    var a = areaMap[r.area] = areaMap[r.area] || { name: r.area, total: 0, completed: 0, pct: 0 };
+    a.total += r.total; a.completed += r.completed;
+  });
+  var areas = Object.keys(areaMap).map(function (k) {
+    var a = areaMap[k];
+    a.pct = a.total ? Math.round((a.completed / a.total) * 1000) / 10 : 0;
+    return a;
+  }).sort(function (a, b) {
+    var ia = AREA_ORDER.indexOf(a.name.toLowerCase()), ib = AREA_ORDER.indexOf(b.name.toLowerCase());
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib) || a.name.localeCompare(b.name);
+  });
 
   restaurants.forEach(function (r) {
     r.pct = r.total ? Math.round((r.completed / r.total) * 1000) / 10 : 0;
@@ -655,6 +704,7 @@ function computeStats(input) {
     leaderboard: board.map(function (r, i) {
       return { rank: i + 1, name: r.name, pct: r.pct, total: r.total, completed: r.completed, lastCompletion: r.lastCompletion };
     }),
+    areas: areas,
     totals: { employees: totalEmp, completed: totalDone, fullRestaurants: full.length, restaurants: restaurants.length },
     details: details,
     warnings: warnings
