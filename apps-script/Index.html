@@ -55,6 +55,7 @@
   .head-row { display: flex; align-items: center; gap: 16px; }
   .logo { width: 64px; height: auto; flex: none; }
   .titles { flex: 1; min-width: 0; }
+  .eyebrow, header h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .eyebrow { font-family: var(--font-eyebrow); font-stretch: normal; font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
   header h1 { font-family: var(--font-title); font-size: clamp(30px, 6vw, 46px); line-height: 1.1; }
   .meta { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; font-weight: 500; }
@@ -123,6 +124,25 @@
   .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
   .filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); flex: 1 1 200px; }
   select, input[type=search] { font: inherit; font-size: 14px; color: var(--ink); padding: 9px 10px; border: 1px solid var(--sand); border-radius: 10px; background: #fff; width: 100%; }
+  .filters .fld { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); flex: 2 1 280px; }
+  .ms { position: relative; }
+  .ms summary { list-style: none; cursor: pointer; font-size: 14px; color: var(--ink); padding: 9px 32px 9px 10px; border: 1px solid var(--sand); border-radius: 10px; background: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
+  .ms summary::-webkit-details-marker { display: none; }
+  .ms summary::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  .ms[open] summary { border-color: var(--cyan); }
+  .ms-panel { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); min-width: 260px; background: #fff; border: 1px solid var(--sand); border-radius: 12px; box-shadow: 0 8px 24px rgba(36,46,82,.15); padding: 10px; color: var(--ink); }
+  .ms-panel input[type=search] { margin-bottom: 8px; }
+  .ms-actions { display: flex; gap: 8px; margin-bottom: 6px; }
+  .ms-actions button { font: inherit; font-size: 12px; border: 0; background: var(--cream); color: var(--navy); padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+  .ms-list { max-height: 300px; overflow: auto; }
+  .ms-group { padding: 4px 0; border-top: 1px solid var(--line); }
+  .ms-group:first-child { border-top: 0; }
+  .filters .ms-area, .filters .ms-item { display: flex; flex-direction: row; flex: none; align-items: center; gap: 8px; font-size: 14px; color: var(--ink); padding: 5px 4px; cursor: pointer; border-radius: 6px; }
+  .ms-area { font-weight: 600; }
+  .ms-item { padding-left: 26px; }
+  .ms-area:hover, .ms-item:hover { background: var(--cream); }
+  .ms-area input, .ms-item input { width: 16px; height: 16px; accent-color: var(--cyan); margin: 0; flex: none; }
+  .ms-single { font-size: 14px; color: var(--ink); padding: 9px 10px; border: 1px solid var(--sand); border-radius: 10px; background: var(--cream); }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
   .chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--cream); }
   .chip b { font-weight: 600; }
@@ -158,7 +178,14 @@
 
   @media (max-width: 720px) {
     header { padding: 16px 0 20px; }
-    .logo { width: 48px; }
+    .logo { width: 44px; }
+    header .wrap { position: relative; }
+    .head-row { gap: 12px; }
+    .lang { position: absolute; right: 16px; bottom: 0; }
+    .lang button { padding: 5px 10px; }
+    header h1 { font-size: clamp(22px, 8.4vw, 40px); }
+    .eyebrow { font-size: clamp(8.5px, 2.75vw, 12px); letter-spacing: .06em; }
+    .meta { padding-right: 96px; }
     section { padding: 16px; }
     .kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
     .kpi-area { grid-column: span 2; }
@@ -213,10 +240,11 @@
       waitingFinal: 'Không có nhà hàng nào đủ điều kiện vinh danh.',
       reached: 'Đạt 100% lúc', lastAt: 'Partner cuối cùng hoàn thành', rankEmpty: 'Còn trống',
       chartTitle: 'Tỉ lệ hoàn thành theo nhà hàng', chartSub: 'Tất cả nhà hàng trong danh sách',
-      sortPct: 'Theo %', sortName: 'Theo tên', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%',
+      sortPct: 'Theo %', sortName: 'Sắp xếp A–Z', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%',
       partners: 'partner', completedOf: 'hoàn thành', noLast: 'Chưa có partner nào hoàn thành',
       detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách partner theo nhà hàng',
-      area: 'Area', allAreas: 'Tất cả Area', restaurant: 'Nhà hàng', allInArea: 'Tất cả nhà hàng',
+      restaurant: 'Nhà hàng', restPick: 'Nhà hàng (chọn nhiều hoặc chọn cả Area)', noArea: 'Khác', allSelected: 'Tất cả nhà hàng', nSelected: 'nhà hàng đã chọn',
+      findRest: 'Tìm nhà hàng…', selectAll: 'Chọn tất cả', clearAll: 'Bỏ chọn', pickHint: 'Chọn một hoặc nhiều nhà hàng (hoặc tích tên Area) để xem danh sách partner.',
       course: 'Khóa học', allCourses: 'Tất cả khóa học', status: 'Trạng thái', all: 'Tất cả',
       stDone: 'Đã hoàn thành', stNot: 'Chưa hoàn thành', search: 'Tìm theo mã / tên', choose: '— Chọn nhà hàng —',
       cCode: 'Mã partner', cName: 'Họ tên', cRest: 'Nhà hàng', cFunc: 'Function', cCourse: 'Khóa học', cStatus: 'Progress Status', cDate: 'Completion Date',
@@ -248,10 +276,11 @@
       waitingFinal: 'No restaurant qualified for the podium.',
       reached: 'Reached 100% at', lastAt: 'Last partner completed', rankEmpty: 'Open',
       chartTitle: 'Completion rate by restaurant', chartSub: 'All restaurants in the list',
-      sortPct: 'By %', sortName: 'By name', legendFull: 'Reached 100%', legendPart: 'Below 100%',
+      sortPct: 'By %', sortName: 'Sort A to Z', legendFull: 'Reached 100%', legendPart: 'Below 100%',
       partners: 'partners', completedOf: 'completed', noLast: 'No partner has completed yet',
       detailTitle: 'Detailed progress', detailSub: 'Partners by restaurant',
-      area: 'Area', allAreas: 'All Areas', restaurant: 'Restaurant', allInArea: 'All restaurants',
+      restaurant: 'Restaurant', restPick: 'Restaurants (pick several or a whole Area)', noArea: 'Other', allSelected: 'All restaurants', nSelected: 'restaurants selected',
+      findRest: 'Find a restaurant…', selectAll: 'Select all', clearAll: 'Clear', pickHint: 'Pick one or more restaurants (or tick an Area) to see the partner list.',
       course: 'Course', allCourses: 'All courses', status: 'Status', all: 'All',
       stDone: 'Completed', stNot: 'Not completed', search: 'Search code / name', choose: '— Select a restaurant —',
       cCode: 'Partner code', cName: 'Name', cRest: 'Restaurant', cFunc: 'Function', cCourse: 'Course', cStatus: 'Progress Status', cDate: 'Completion Date',
@@ -273,13 +302,12 @@
     }
   };
 
-  var ALL = '__all__';
   var lang = 'vi';
   try { lang = localStorage.getItem('lc_lang') || 'vi'; } catch (e) {}
   var DATA = null;
   var chartSort = 'pct';
   var detailCache = {};
-  var detailState = { area: '', restaurant: '', course: '', status: '', q: '' };
+  var detailState = { selected: [], course: '', status: '', q: '' };
 
   function t(k) { return (I18N[lang] && I18N[lang][k]) || I18N.vi[k] || k; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -349,10 +377,9 @@
       var r = d.leaderboard[i - 1];
       var crown = i === 1 ? '<div class="crown" aria-hidden="true">👑</div>' : '';
       if (!r) { cells += '<div class="place r' + i + ' empty">' + crown + '<div class="medal">' + i + '</div><div class="rname">' + t('rankEmpty') + '</div><div class="rstat">&nbsp;</div></div>'; continue; }
-      var counts = hasCounts(r) ? ' · ' + r.completed + '/' + r.total + ' ' + t('partners') : '';
       var stat = r.full
-        ? '<b class="num">100%' + counts + '</b><br>' + t('reached') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>'
-        : '<b class="num">' + fmtPct(r.pct) + counts + '</b>' + (r.lastCompletion ? '<br>' + t('lastAt') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>' : '');
+        ? '<b class="num">100%</b><br>' + t('reached') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>'
+        : '<b class="num">' + fmtPct(r.pct) + '</b>' + (r.lastCompletion ? '<br>' + t('lastAt') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>' : '');
       cells += '<div class="place r' + i + '">' + crown + '<div class="medal">' + i + '</div><div class="rname">' + esc(r.name) + '</div><div class="rstat">' + stat + '</div></div>';
     }
     return '<section>' + head + '<div class="podium">' + cells + '</div></section>';
@@ -394,31 +421,56 @@
     });
   }
 
-  /* ---------- Tiến độ chi tiết ---------- */
-  function allowedRestaurants() {
-    return DATA.detailRestaurants.filter(function (n) {
-      if (!detailState.area) return true;
+  /* ---------- Tiến độ chi tiết (chọn nhiều nhà hàng / cả Area) ---------- */
+  function areaGroups() {
+    var groups = [], idx = {};
+    DATA.detailRestaurants.forEach(function (n) {
       var r = restByName(n);
-      return r && r.area === detailState.area;
+      var a = (r && r.area) || t('noArea');
+      if (!idx.hasOwnProperty(a)) { idx[a] = groups.length; groups.push({ area: a, names: [] }); }
+      groups[idx[a]].names.push(n);
     });
+    var order = ['north', 'south', 'central'];
+    return groups.sort(function (x, y) {
+      var ix = order.indexOf(x.area.toLowerCase()), iy = order.indexOf(y.area.toLowerCase());
+      return (ix === -1 ? 99 : ix) - (iy === -1 ? 99 : iy) || x.area.localeCompare(y.area);
+    });
+  }
+
+  function selLabel() {
+    var sel = detailState.selected;
+    if (!sel.length) return t('choose');
+    if (sel.length === 1) return esc(sel[0]);
+    if (sel.length === DATA.detailRestaurants.length) return t('allSelected') + ' (' + sel.length + ')';
+    var full = areaGroups().filter(function (g) { return g.names.every(function (n) { return sel.indexOf(n) !== -1; }); });
+    if (full.length && full.reduce(function (s, g) { return s + g.names.length; }, 0) === sel.length) {
+      return full.map(function (g) { return esc(g.area); }).join(', ') + ' (' + sel.length + ')';
+    }
+    return sel.length + ' ' + t('nSelected');
   }
 
   function renderDetailShell(d) {
     var head = '<div class="sec-head"><div><h2>' + t('detailTitle') + '</h2><div class="sub">' + t('detailSub') + '</div></div></div>';
     if (!d.detailRestaurants.length) return '<section>' + head + '<div class="locked">🔒 ' + t('locked') + '</div></section>';
-    if (!detailState.restaurant && d.detailRestaurants.length === 1) detailState.restaurant = d.detailRestaurants[0];
+    detailState.selected = detailState.selected.filter(function (n) { return d.detailRestaurants.indexOf(n) !== -1; });
+    if (!detailState.selected.length && d.detailRestaurants.length === 1) detailState.selected = [d.detailRestaurants[0]];
 
-    var areaList = [];
-    d.detailRestaurants.forEach(function (n) { var r = restByName(n); if (r && r.area && areaList.indexOf(r.area) === -1) areaList.push(r.area); });
-    var showArea = d.detailRestaurants.length > 1 && areaList.length > 0;
-    var aOpts = '<option value="">' + t('allAreas') + '</option>' + areaList.map(function (a) {
-      return '<option' + (a === detailState.area ? ' selected' : '') + ' value="' + esc(a) + '">' + esc(a) + '</option>';
+    var multi = d.detailRestaurants.length > 1;
+    var groups = areaGroups();
+    var list = groups.map(function (g) {
+      return '<div class="ms-group">' +
+        (groups.length > 1 || g.names.length > 1 ? '<label class="ms-area"><input type="checkbox" data-area="' + esc(g.area) + '"> ' + esc(g.area) + ' <span class="sub">(' + g.names.length + ')</span></label>' : '') +
+        g.names.map(function (n) {
+          return '<label class="ms-item" data-name="' + esc(n.toLowerCase()) + '"><input type="checkbox" data-rest="' + esc(n) + '"' + (detailState.selected.indexOf(n) !== -1 ? ' checked' : '') + '> ' + esc(n) + '</label>';
+        }).join('') + '</div>';
     }).join('');
+    var picker = multi
+      ? '<details class="ms" id="ms"><summary id="msLabel">' + selLabel() + '</summary><div class="ms-panel">' +
+        '<input type="search" id="msQ" placeholder="' + t('findRest') + '">' +
+        '<div class="ms-actions"><button type="button" id="msAll">' + t('selectAll') + '</button><button type="button" id="msNone">' + t('clearAll') + '</button></div>' +
+        '<div class="ms-list">' + list + '</div></div></details>'
+      : '<div class="ms-single">' + esc(d.detailRestaurants[0]) + '</div>';
 
-    var rests = allowedRestaurants();
-    var rOpts = '<option value="">' + t('choose') + '</option>' +
-      (rests.length > 1 && detailState.area ? '<option value="' + ALL + '"' + (detailState.restaurant === ALL ? ' selected' : '') + '>' + t('allInArea') + ' (' + esc(detailState.area) + ')</option>' : '') +
-      rests.map(function (n) { return '<option' + (n === detailState.restaurant ? ' selected' : '') + ' value="' + esc(n) + '">' + esc(n) + '</option>'; }).join('');
     var cOpts = '<option value="">' + t('allCourses') + '</option>' + d.courses.map(function (c) {
       return '<option' + (c.id === detailState.course ? ' selected' : '') + ' value="' + esc(c.id) + '">' + esc(c.name) + '</option>';
     }).join('');
@@ -427,25 +479,62 @@
     }).join('');
     return '<section>' + head +
       '<div class="filters">' +
-      (showArea ? '<label>' + t('area') + '<select id="fArea">' + aOpts + '</select></label>' : '') +
-      '<label>' + t('restaurant') + '<select id="fRest">' + rOpts + '</select></label>' +
+      '<div class="fld f-wide">' + (multi ? t('restPick') : t('restaurant')) + picker + '</div>' +
       (d.courses.length > 1 ? '<label>' + t('course') + '<select id="fCourse">' + cOpts + '</select></label>' : '') +
       '<label>' + t('status') + '<select id="fStatus">' + sOpts + '</select></label>' +
       '<label>' + t('search') + '<input type="search" id="fQ" value="' + esc(detailState.q) + '"></label>' +
       '</div><div id="detailBody"></div></section>';
   }
 
+  function syncPicker() {
+    var sel = detailState.selected;
+    document.querySelectorAll('#ms [data-rest]').forEach(function (cb) { cb.checked = sel.indexOf(cb.dataset.rest) !== -1; });
+    areaGroups().forEach(function (g) {
+      var cb = document.querySelector('#ms [data-area="' + g.area.replace(/"/g, '\\"') + '"]');
+      if (!cb) return;
+      var n = g.names.filter(function (x) { return sel.indexOf(x) !== -1; }).length;
+      cb.checked = n === g.names.length;
+      cb.indeterminate = n > 0 && n < g.names.length;
+    });
+    var lbl = document.getElementById('msLabel');
+    if (lbl) lbl.innerHTML = selLabel();
+  }
+
+  var loadTimer = null;
+  function selectionChanged() {
+    syncPicker();
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(loadDetail, 350);
+  }
+
   function bindDetail() {
-    var rest = document.getElementById('fRest');
-    if (!rest) return;
-    var area = document.getElementById('fArea');
-    if (area) area.onchange = function () {
-      detailState.area = area.value;
-      if (detailState.restaurant && allowedRestaurants().indexOf(detailState.restaurant) === -1) detailState.restaurant = '';
-      if (detailState.restaurant === ALL && !detailState.area) detailState.restaurant = '';
-      render();
-    };
-    rest.onchange = function () { detailState.restaurant = rest.value; loadDetail(); };
+    if (!document.getElementById('detailBody')) return;
+    var ms = document.getElementById('ms');
+    if (ms) {
+      ms.addEventListener('change', function (e) {
+        var el = e.target;
+        if (el.dataset.rest) {
+          var i = detailState.selected.indexOf(el.dataset.rest);
+          if (el.checked && i === -1) detailState.selected.push(el.dataset.rest);
+          if (!el.checked && i !== -1) detailState.selected.splice(i, 1);
+        } else if (el.dataset.area) {
+          var g = areaGroups().filter(function (x) { return x.area === el.dataset.area; })[0];
+          g.names.forEach(function (n) {
+            var j = detailState.selected.indexOf(n);
+            if (el.checked && j === -1) detailState.selected.push(n);
+            if (!el.checked && j !== -1) detailState.selected.splice(j, 1);
+          });
+        } else return;
+        selectionChanged();
+      });
+      document.getElementById('msAll').onclick = function () { detailState.selected = DATA.detailRestaurants.slice(); selectionChanged(); };
+      document.getElementById('msNone').onclick = function () { detailState.selected = []; selectionChanged(); };
+      document.getElementById('msQ').oninput = function (e) {
+        var q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('#ms .ms-item').forEach(function (it) { it.style.display = !q || it.dataset.name.indexOf(q) !== -1 ? '' : 'none'; });
+      };
+      syncPicker();
+    }
     var c = document.getElementById('fCourse');
     if (c) c.onchange = function () { detailState.course = c.value; drawDetail(); };
     document.getElementById('fStatus').onchange = function (e) { detailState.status = e.target.value; drawDetail(); };
@@ -454,23 +543,23 @@
   }
 
   function selectedNames() {
-    if (!detailState.restaurant) return [];
-    return detailState.restaurant === ALL ? allowedRestaurants() : [detailState.restaurant];
+    // Giữ thứ tự theo danh sách nhà hàng
+    return DATA.detailRestaurants.filter(function (n) { return detailState.selected.indexOf(n) !== -1; });
   }
 
   function loadDetail() {
     var names = selectedNames();
     var body = document.getElementById('detailBody');
-    if (!names.length) { body.innerHTML = ''; return; }
+    if (!body) return;
+    if (!names.length) { body.innerHTML = '<div class="locked">' + t('pickHint') + '</div>'; return; }
     var missing = names.filter(function (n) { return !detailCache[n]; });
     if (!missing.length) { drawDetail(); return; }
     body.innerHTML = '<div class="sub">' + t('loading') + '</div>';
-    var key = detailState.restaurant + '|' + detailState.area;
     google.script.run
       .withSuccessHandler(function (map) {
         Object.keys(map).forEach(function (n) { detailCache[n] = map[n]; });
         missing.forEach(function (n) { if (!detailCache[n]) detailCache[n] = []; });
-        if (detailState.restaurant + '|' + detailState.area === key) drawDetail();
+        drawDetail();
       })
       .withFailureHandler(function (err) { body.innerHTML = '<div class="locked">' + (String(err && err.message).indexOf('NO_ACCESS') !== -1 ? t('noAccess') : t('error')) + '</div>'; })
       .getDetails(missing);
@@ -573,6 +662,11 @@
       .getDashboardData();
   }
 
+  // Bấm ra ngoài thì đóng danh sách chọn nhà hàng
+  document.addEventListener('click', function (e) {
+    var ms = document.getElementById('ms');
+    if (ms && ms.open && !ms.contains(e.target)) ms.open = false;
+  });
   document.getElementById('logo').src = window.LOGOS.light;
   document.querySelectorAll('.lang button').forEach(function (b) {
     b.onclick = function () {
