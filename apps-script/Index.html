@@ -33,20 +33,21 @@
     /* Font thương hiệu (nạp từ file Fonts nếu có), nếu chưa có dùng font thay thế */
     --font-title: 'ITC Century Light Condensed', 'Roboto Serif', Georgia, serif;
     --font-eyebrow: 'Atlas Grotesk', 'Inter', Arial, sans-serif;
+    --font-body: 'Atlas Grotesk', 'Inter', Arial, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
     background: var(--cream);
     color: var(--ink);
-    font-family: 'Roboto Serif', 'Century Schoolbook', Georgia, serif;
-    font-stretch: 85%;
+    font-family: var(--font-body);
     font-weight: 400;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.45;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { font-weight: 300; font-stretch: 62.5%; margin: 0; letter-spacing: .01em; }
+  h1, h2, h3 { font-weight: 400; margin: 0; letter-spacing: -.005em; }
+  header h1 { font-weight: 300; font-stretch: 62.5%; letter-spacing: .01em; }
   .num { font-variant-numeric: tabular-nums; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 
@@ -68,13 +69,13 @@
   main.wrap { padding-top: 24px; padding-bottom: 48px; }
   section { background: var(--card); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; box-shadow: 0 1px 0 var(--line); }
   .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-  section h2 { font-size: 26px; }
+  section h2 { font-size: 22px; }
   .sub { color: var(--muted); font-size: 13px; }
 
   /* KPI */
   .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
   .kpi { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: 0 1px 0 var(--line); }
-  .kpi .v { font-size: 30px; font-weight: 300; font-stretch: 62.5%; line-height: 1.1; }
+  .kpi .v { font-size: 28px; font-weight: 400; line-height: 1.1; }
   .kpi .l { font-size: 12px; color: var(--muted); }
   .area-rows { display: grid; gap: 4px; margin-top: 2px; }
   .area-row { display: grid; grid-template-columns: 64px 1fr 48px; align-items: center; gap: 8px; font-size: 13px; }
@@ -89,17 +90,17 @@
   .place.r2 { order: 1; background: var(--cyan-soft); color: var(--navy); }
   .crown { font-size: 30px; line-height: 1; margin-bottom: 4px; }
   .place.r3 { order: 3; }
-  .medal { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 10px; font-size: 22px; font-weight: 600; font-stretch: 75%; }
+  .medal { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 10px; font-size: 22px; font-weight: 700; }
   .r1 .medal { background: var(--gold); color: var(--navy); width: 60px; height: 60px; font-size: 28px; }
   .r2 .medal { background: #fff; color: var(--navy); }
   .r3 .medal { background: var(--bronze); color: #fff; }
-  .place .rname { font-size: 22px; font-weight: 300; font-stretch: 62.5%; line-height: 1.15; word-break: break-word; }
-  .r1 .rname { font-size: 28px; }
+  .place .rname { font-size: 20px; font-weight: 400; line-height: 1.2; word-break: break-word; }
+  .r1 .rname { font-size: 24px; }
   .place .rstat { font-size: 13px; margin-top: 6px; opacity: .85; }
   .place.empty { opacity: .45; }
   .waiting { text-align: center; padding: 34px 16px; background: var(--cream); border-radius: var(--radius); }
   .waiting img { width: 72px; opacity: .9; }
-  .waiting h3 { font-size: 26px; margin: 10px 0 4px; }
+  .waiting h3 { font-size: 22px; margin: 10px 0 4px; }
 
   /* Chart */
   .chart-tools { display: flex; gap: 6px; }
@@ -193,11 +194,13 @@
     .kpi .v { font-size: 22px; }
     .podium { grid-template-columns: 1fr; }
     .place.r1, .place.r2, .place.r3 { order: 0; padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 0 14px; text-align: left; align-items: center; }
-    .place .medal { margin: 0; grid-row: span 2; }
-    .place.r1 { padding-top: 22px; }
-    .crown { position: absolute; top: -14px; left: 22px; font-size: 24px; margin: 0; }
-    .r1 .rname, .place .rname { font-size: 22px; }
-    .bar-row { grid-template-columns: minmax(80px, 34%) 1fr 74px; gap: 8px; }
+    .place .medal-wrap { grid-row: span 2; position: relative; }
+    .place .medal { margin: 0; }
+    .place.r1 { padding-top: 30px; }
+    .crown { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); font-size: 22px; margin: 0 0 -4px; }
+    .r1 .rname, .place .rname { font-size: 19px; }
+    .bar-row { grid-template-columns: 40% 1fr 62px; gap: 8px; }
+    .bar-name { white-space: normal; overflow: visible; line-height: 1.25; }
     .bar-val span { display: none; }
   }
 </style>
@@ -233,21 +236,21 @@
       from: 'Bắt đầu', end: 'Kết thúc', updated: 'Cập nhật lúc',
       frozen: 'ĐÃ CHỐT KẾT QUẢ',
       kpiFull: 'Nhà hàng đạt 100%', kpiRate: 'Tỉ lệ hoàn thành toàn chuỗi', kpiArea: 'Tỉ lệ hoàn thành theo Area',
-      boardTitle: 'Bảng vinh danh', boardSubLive: '3 nhà hàng có tỉ lệ hoàn thành cao nhất. Bằng tỉ lệ: nhà hàng có partner cuối cùng hoàn thành sớm hơn xếp trên',
+      boardTitle: 'Bảng vinh danh', boardSubLive: '3 nhà hàng có tỉ lệ hoàn thành cao nhất. Bằng tỉ lệ: nhà hàng có Partner cuối cùng hoàn thành sớm hơn xếp trên',
       boardSubFinal: 'Kết quả chung cuộc',
       waitingTitle: 'Đang chờ các Learning Champions lộ diện…',
-      waitingSub: 'Ngay khi có partner hoàn thành khóa học, bảng vinh danh sẽ xuất hiện tại đây.',
+      waitingSub: 'Ngay khi có Partner hoàn thành khóa học, bảng vinh danh sẽ xuất hiện tại đây.',
       waitingFinal: 'Không có nhà hàng nào đủ điều kiện vinh danh.',
       reached: 'Đạt 100% lúc', lastAt: 'Partner cuối cùng hoàn thành', rankEmpty: 'Còn trống',
       chartTitle: 'Tỉ lệ hoàn thành theo nhà hàng', chartSub: 'Tất cả nhà hàng trong danh sách',
       sortPct: 'Theo %', sortName: 'Sắp xếp A–Z', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%',
-      partners: 'partner', completedOf: 'hoàn thành', noLast: 'Chưa có partner nào hoàn thành',
-      detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách partner theo nhà hàng',
+      partners: 'Partner', completedOf: 'hoàn thành', noLast: 'Chưa có Partner nào hoàn thành',
+      detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách Partner theo nhà hàng',
       restaurant: 'Nhà hàng', restPick: 'Nhà hàng (chọn nhiều hoặc chọn cả Area)', noArea: 'Khác', allSelected: 'Tất cả nhà hàng', nSelected: 'nhà hàng đã chọn',
-      findRest: 'Tìm nhà hàng…', selectAll: 'Chọn tất cả', clearAll: 'Bỏ chọn', pickHint: 'Chọn một hoặc nhiều nhà hàng (hoặc tích tên Area) để xem danh sách partner.',
+      findRest: 'Tìm nhà hàng…', selectAll: 'Chọn tất cả', clearAll: 'Bỏ chọn', pickHint: 'Chọn một hoặc nhiều nhà hàng (hoặc tích tên Area) để xem danh sách Partner.',
       course: 'Khóa học', allCourses: 'Tất cả khóa học', status: 'Trạng thái', all: 'Tất cả',
       stDone: 'Đã hoàn thành', stNot: 'Chưa hoàn thành', search: 'Tìm theo mã / tên', choose: '— Chọn nhà hàng —',
-      cCode: 'Mã partner', cName: 'Họ tên', cRest: 'Nhà hàng', cFunc: 'Function', cCourse: 'Khóa học', cStatus: 'Progress Status', cDate: 'Completion Date',
+      cCode: 'Mã Partner', cName: 'Họ tên', cRest: 'Nhà hàng', cFunc: 'Function', cCourse: 'Khóa học', cStatus: 'Progress Status', cDate: 'Completion Date',
       locked: 'Phần chi tiết chỉ hiển thị cho Restaurant Manager của nhà hàng và ban quản lý.',
       noRows: 'Không có dữ liệu phù hợp.', rows: 'dòng',
       adminTitle: 'Khu vực Admin', adminSub: 'Chỉ admin nhìn thấy khu vực này',
@@ -257,8 +260,8 @@
       cFreeze: 'Chốt bảng xếp hạng theo dữ liệu hiện tại? Sau khi chốt, dashboard sẽ không tự cập nhật mỗi sáng nữa.',
       cUnfreeze: 'Mở chốt? Dashboard sẽ tự cập nhật lại mỗi sáng.',
       lastPull: 'Lần lấy TalentLMS gần nhất', lastErr: 'Lỗi gần nhất', warn: 'Cảnh báo dữ liệu', noWarn: 'Không có cảnh báo dữ liệu.',
-      wUnknown: 'Partner có nhà hàng không nằm trong Restaurant list', wDup: 'Mã partner bị trùng trong Detailed list (chỉ tính dòng đầu)',
-      wNotIn: 'Mã partner trên LMS không có trong Detailed list', wNoArea: 'Nhà hàng chưa có Area (cột D, Restaurant list)',
+      wUnknown: 'Partner có nhà hàng không nằm trong Restaurant list', wDup: 'Mã Partner bị trùng trong Detailed list (chỉ tính dòng đầu)',
+      wNotIn: 'Mã Partner trên LMS không có trong Detailed list', wNoArea: 'Nhà hàng chưa có Area (cột D, Restaurant list)',
       wShown: 'Hiển thị tối đa 300 mã đầu tiên', wRestVal: 'Nhà hàng ghi trong Detailed list', blank: '(trống)',
       done: 'Đã xong!', error: 'Có lỗi xảy ra', noAccess: 'Bạn không có quyền xem chi tiết nhà hàng này.',
       footer: 'Dữ liệu nội bộ Pizza 4P\'s — vui lòng không chia sẻ ra bên ngoài.',
@@ -269,18 +272,18 @@
       from: 'Starts', end: 'Ends', updated: 'Updated',
       frozen: 'RESULTS FINALISED',
       kpiFull: 'Restaurants at 100%', kpiRate: 'Chain-wide completion', kpiArea: 'Completion by Area',
-      boardTitle: 'Hall of Champions', boardSubLive: 'Top 3 restaurants by completion rate. Ties go to the restaurant whose last partner finished earlier',
+      boardTitle: 'Hall of Champions', boardSubLive: 'Top 3 restaurants by completion rate. Ties go to the restaurant whose last Partner finished earlier',
       boardSubFinal: 'Final results',
       waitingTitle: 'Waiting for our Learning Champions to emerge…',
-      waitingSub: 'As soon as partners start completing the course, the podium will appear here.',
+      waitingSub: 'As soon as Partners start completing the course, the podium will appear here.',
       waitingFinal: 'No restaurant qualified for the podium.',
-      reached: 'Reached 100% at', lastAt: 'Last partner completed', rankEmpty: 'Open',
+      reached: 'Reached 100% at', lastAt: 'Last Partner completed', rankEmpty: 'Open',
       chartTitle: 'Completion rate by restaurant', chartSub: 'All restaurants in the list',
       sortPct: 'By %', sortName: 'Sort A to Z', legendFull: 'Reached 100%', legendPart: 'Below 100%',
-      partners: 'partners', completedOf: 'completed', noLast: 'No partner has completed yet',
+      partners: 'Partners', completedOf: 'completed', noLast: 'No Partner has completed yet',
       detailTitle: 'Detailed progress', detailSub: 'Partners by restaurant',
       restaurant: 'Restaurant', restPick: 'Restaurants (pick several or a whole Area)', noArea: 'Other', allSelected: 'All restaurants', nSelected: 'restaurants selected',
-      findRest: 'Find a restaurant…', selectAll: 'Select all', clearAll: 'Clear', pickHint: 'Pick one or more restaurants (or tick an Area) to see the partner list.',
+      findRest: 'Find a restaurant…', selectAll: 'Select all', clearAll: 'Clear', pickHint: 'Pick one or more restaurants (or tick an Area) to see the Partner list.',
       course: 'Course', allCourses: 'All courses', status: 'Status', all: 'All',
       stDone: 'Completed', stNot: 'Not completed', search: 'Search code / name', choose: '— Select a restaurant —',
       cCode: 'Partner code', cName: 'Name', cRest: 'Restaurant', cFunc: 'Function', cCourse: 'Course', cStatus: 'Progress Status', cDate: 'Completion Date',
@@ -293,8 +296,8 @@
       cFreeze: 'Finalise the leaderboard with current data? The dashboard will stop auto-updating each morning.',
       cUnfreeze: 'Unfreeze? The dashboard will auto-update every morning again.',
       lastPull: 'Last TalentLMS pull', lastErr: 'Last error', warn: 'Data warnings', noWarn: 'No data warnings.',
-      wUnknown: 'Partners whose restaurant is not in Restaurant list', wDup: 'Duplicate partner codes in Detailed list (first row counted)',
-      wNotIn: 'LMS partner codes not in Detailed list', wNoArea: 'Restaurants without an Area (column D, Restaurant list)',
+      wUnknown: 'Partners whose restaurant is not in Restaurant list', wDup: 'Duplicate Partner codes in Detailed list (first row counted)',
+      wNotIn: 'LMS Partner codes not in Detailed list', wNoArea: 'Restaurants without an Area (column D, Restaurant list)',
       wShown: 'Showing up to the first 300 codes', wRestVal: 'Restaurant in Detailed list', blank: '(blank)',
       done: 'Done!', error: 'Something went wrong', noAccess: 'You don\'t have access to this restaurant\'s details.',
       footer: 'Pizza 4P\'s internal data — please do not share externally.',
@@ -323,6 +326,8 @@
     var c = (DATA.courses || []).filter(function (x) { return x.id === id; })[0];
     return c ? c.name : id;
   }
+  // Bỏ tiền tố "Pizza 4P's" trong biểu đồ cho gọn
+  function shortName(n) { return String(n).replace(/^\s*pizza\s*4\s*p['’]?s\s*[-–·:]?\s*/i, '') || n; }
   function restByName(n) { return DATA.restaurants.filter(function (x) { return x.name === n; })[0]; }
   function hasCounts(r) { return r && r.total != null; }
 
@@ -375,12 +380,12 @@
     var cells = '';
     for (var i = 1; i <= 3; i++) {
       var r = d.leaderboard[i - 1];
-      var crown = i === 1 ? '<div class="crown" aria-hidden="true">👑</div>' : '';
-      if (!r) { cells += '<div class="place r' + i + ' empty">' + crown + '<div class="medal">' + i + '</div><div class="rname">' + t('rankEmpty') + '</div><div class="rstat">&nbsp;</div></div>'; continue; }
+      var medal = '<div class="medal-wrap">' + (i === 1 ? '<div class="crown" aria-hidden="true">👑</div>' : '') + '<div class="medal">' + i + '</div></div>';
+      if (!r) { cells += '<div class="place r' + i + ' empty">' + medal + '<div class="rname">' + t('rankEmpty') + '</div><div class="rstat">&nbsp;</div></div>'; continue; }
       var stat = r.full
         ? '<b class="num">100%</b><br>' + t('reached') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>'
         : '<b class="num">' + fmtPct(r.pct) + '</b>' + (r.lastCompletion ? '<br>' + t('lastAt') + ' <span class="num">' + fmtDate(r.lastCompletion, true) + '</span>' : '');
-      cells += '<div class="place r' + i + '">' + crown + '<div class="medal">' + i + '</div><div class="rname">' + esc(r.name) + '</div><div class="rstat">' + stat + '</div></div>';
+      cells += '<div class="place r' + i + '">' + medal + '<div class="rname">' + esc(r.name) + '</div><div class="rstat">' + stat + '</div></div>';
     }
     return '<section>' + head + '<div class="podium">' + cells + '</div></section>';
   }
@@ -388,10 +393,10 @@
   function renderChart(d) {
     var list = d.restaurants.slice();
     if (chartSort === 'pct') list.sort(function (a, b) { return b.pct - a.pct || (a.lastCompletion || Infinity) - (b.lastCompletion || Infinity) || a.name.localeCompare(b.name); });
-    else list.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    else list.sort(function (a, b) { return shortName(a.name).localeCompare(shortName(b.name), 'vi'); });
     var rows = list.map(function (r) {
       return '<div class="bar-row" data-i="' + d.restaurants.indexOf(r) + '">' +
-        '<div class="bar-name" title="' + esc(r.name) + '">' + esc(r.name) + '</div>' +
+        '<div class="bar-name" title="' + esc(r.name) + '">' + esc(shortName(r.name)) + '</div>' +
         '<div class="bar-track"><div class="bar-fill' + (r.full ? ' full' : '') + '" style="width:' + Math.min(100, r.pct) + '%"></div></div>' +
         '<div class="bar-val num"><b>' + (r.full ? '✓ ' : '') + fmtPct(r.pct) + '</b></div></div>';
     }).join('');
