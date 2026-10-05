@@ -193,11 +193,9 @@
     .kpi { padding: 12px 10px; }
     .kpi .v { font-size: 22px; }
     .podium { grid-template-columns: 1fr; }
-    .place.r1, .place.r2, .place.r3 { order: 0; padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 0 14px; text-align: left; align-items: center; }
-    .place .medal-wrap { grid-row: span 2; position: relative; }
-    .place .medal { margin: 0; }
-    .place.r1 { padding-top: 30px; }
-    .crown { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); font-size: 22px; margin: 0 0 -4px; }
+    .place.r1, .place.r2, .place.r3 { order: 0; padding: 18px 16px; text-align: center; }
+    .place.r1 { padding-top: 22px; }
+    .crown { font-size: 26px; }
     .r1 .rname, .place .rname { font-size: 19px; }
     .bar-row { grid-template-columns: 40% 1fr 62px; gap: 8px; }
     .bar-name { white-space: normal; overflow: visible; line-height: 1.25; }
@@ -242,10 +240,10 @@
       waitingSub: 'Ngay khi có Partner hoàn thành khóa học, bảng vinh danh sẽ xuất hiện tại đây.',
       waitingFinal: 'Không có nhà hàng nào đủ điều kiện vinh danh.',
       reached: 'Đạt 100% lúc', lastAt: 'Partner cuối cùng hoàn thành', rankEmpty: 'Còn trống',
-      chartTitle: 'Tỉ lệ hoàn thành theo nhà hàng', chartSub: 'Tất cả nhà hàng trong danh sách',
+      chartTitle: 'Tỉ lệ hoàn thành theo nhà hàng', chartSub: 'Tất cả nhà hàng Pizza 4P\'s tại Việt Nam',
       sortPct: 'Theo %', sortName: 'Sắp xếp A–Z', legendFull: 'Đạt 100%', legendPart: 'Chưa đạt 100%',
       partners: 'Partner', completedOf: 'hoàn thành', noLast: 'Chưa có Partner nào hoàn thành',
-      detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách Partner theo nhà hàng',
+      detailTitle: 'Tiến độ chi tiết', detailSub: 'Danh sách Partner thi đua: Take Care, Frontline Trainer, Service Leader, ASM - Service, RM.',
       restaurant: 'Nhà hàng', restPick: 'Nhà hàng (chọn nhiều hoặc chọn cả Area)', noArea: 'Khác', allSelected: 'Tất cả nhà hàng', nSelected: 'nhà hàng đã chọn',
       findRest: 'Tìm nhà hàng…', selectAll: 'Chọn tất cả', clearAll: 'Bỏ chọn', pickHint: 'Chọn một hoặc nhiều nhà hàng (hoặc tích tên Area) để xem danh sách Partner.',
       course: 'Khóa học', allCourses: 'Tất cả khóa học', status: 'Trạng thái', all: 'Tất cả',
@@ -278,10 +276,10 @@
       waitingSub: 'As soon as Partners start completing the course, the podium will appear here.',
       waitingFinal: 'No restaurant qualified for the podium.',
       reached: 'Reached 100% at', lastAt: 'Last Partner completed', rankEmpty: 'Open',
-      chartTitle: 'Completion rate by restaurant', chartSub: 'All restaurants in the list',
+      chartTitle: 'Completion rate by restaurant', chartSub: 'All Pizza 4P\'s restaurants in Vietnam',
       sortPct: 'By %', sortName: 'Sort A to Z', legendFull: 'Reached 100%', legendPart: 'Below 100%',
       partners: 'Partners', completedOf: 'completed', noLast: 'No Partner has completed yet',
-      detailTitle: 'Detailed progress', detailSub: 'Partners by restaurant',
+      detailTitle: 'Detailed progress', detailSub: 'Competing Partners: Take Care, Frontline Trainer, Service Leader, ASM - Service, RM.',
       restaurant: 'Restaurant', restPick: 'Restaurants (pick several or a whole Area)', noArea: 'Other', allSelected: 'All restaurants', nSelected: 'restaurants selected',
       findRest: 'Find a restaurant…', selectAll: 'Select all', clearAll: 'Clear', pickHint: 'Pick one or more restaurants (or tick an Area) to see the Partner list.',
       course: 'Course', allCourses: 'All courses', status: 'Status', all: 'All',
@@ -327,7 +325,7 @@
     return c ? c.name : id;
   }
   // Bỏ tiền tố "Pizza 4P's" trong biểu đồ cho gọn
-  function shortName(n) { return String(n).replace(/^\s*pizza\s*4\s*p['’]?s\s*[-–·:]?\s*/i, '') || n; }
+  function shortName(n) { return String(n).replace(/^\s*pizza\s*4\s*p['’`]?s?[\s_\-–—·:|.,\/]*/i, '') || n; }
   function restByName(n) { return DATA.restaurants.filter(function (x) { return x.name === n; })[0]; }
   function hasCounts(r) { return r && r.total != null; }
 
