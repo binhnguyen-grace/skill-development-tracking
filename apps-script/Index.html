@@ -162,6 +162,7 @@
 
   /* Admin */
   .admin { border: 2px dashed var(--sand); background: #fff; }
+  .admin-banner { background: var(--gold); color: var(--navy); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 16px; font-size: 13px; }
   .admin-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
   .btn { font: inherit; font-size: 14px; padding: 9px 16px; border-radius: 10px; border: 1px solid var(--navy); background: #fff; color: var(--navy); cursor: pointer; }
   .btn.primary { background: var(--navy); color: var(--cream); }
@@ -263,6 +264,10 @@
       wNotIn: 'Mã Partner trên LMS không có trong Detailed list', wNoArea: 'Nhà hàng chưa có Area (cột D, Restaurant list)',
       wShown: 'Hiển thị tối đa 300 mã đầu tiên', wRestVal: 'Nhà hàng ghi trong Detailed list', blank: '(trống)',
       done: 'Đã xong!', error: 'Có lỗi xảy ra', noAccess: 'Bạn không có quyền xem chi tiết nhà hàng này.',
+      hiddenTitle: 'Kết quả xếp hạng đang tạm ẩn', hiddenSub: 'Ban tổ chức sẽ công bố kết quả sớm. Bạn vẫn có thể theo dõi tiến độ chi tiết bên dưới.',
+      hiddenBanner: 'Kết quả xếp hạng (phần KPI, Bảng vinh danh, Biểu đồ) đang ẨN với quản lý nhà hàng. Chỉ admin thấy phần này.',
+      aToggleRank: 'Ẩn/ hiện kết quả xếp hạng', rankState: 'Kết quả xếp hạng với quản lý nhà hàng', rankHidden: 'Đang ẨN', rankShown: 'Đang hiển thị',
+      cHideRank: 'ẨN kết quả xếp hạng (KPI, Bảng vinh danh, Biểu đồ) với quản lý nhà hàng?', cShowRank: 'HIỆN lại kết quả xếp hạng cho quản lý nhà hàng?',
       footer: 'Dữ liệu nội bộ Pizza 4P\'s — vui lòng không chia sẻ ra bên ngoài.',
       stMap: { 'Completed': 'Hoàn thành', 'Not started': 'Chưa bắt đầu', 'Not enrolled': 'Chưa ghi danh' }
     },
@@ -299,6 +304,10 @@
       wNotIn: 'LMS Partner codes not in Detailed list', wNoArea: 'Restaurants without an Area (column D, Restaurant list)',
       wShown: 'Showing up to the first 300 codes', wRestVal: 'Restaurant in Detailed list', blank: '(blank)',
       done: 'Done!', error: 'Something went wrong', noAccess: 'You don\'t have access to this restaurant\'s details.',
+      hiddenTitle: 'Rankings are temporarily hidden', hiddenSub: 'The organisers will announce results soon. You can still follow detailed progress below.',
+      hiddenBanner: 'Rankings (KPIs, Hall of Champions, Chart) are HIDDEN from restaurant managers. Only admins see this.',
+      aToggleRank: 'Hide/ show rankings', rankState: 'Rankings for restaurant managers', rankHidden: 'HIDDEN', rankShown: 'Visible',
+      cHideRank: 'HIDE rankings (KPIs, Hall of Champions, Chart) from restaurant managers?', cShowRank: 'SHOW rankings to restaurant managers again?',
       footer: 'Pizza 4P\'s internal data — please do not share externally.',
       stMap: {}
     }
@@ -347,9 +356,14 @@
     document.getElementById('meta').innerHTML = meta.join('');
 
     var html = '';
-    if (d.totals) html += renderKpis(d);
-    html += renderBoard(d);
-    html += renderChart(d);
+    if (d.rankingHidden) {
+      html += '<section><div class="waiting"><img src="' + window.LOGOS.navy + '" alt=""><h3>' + t('hiddenTitle') + '</h3><div class="sub">' + t('hiddenSub') + '</div></div></section>';
+    } else {
+      if (d.viewer.isAdmin && d.admin && d.admin.rankingHiddenSetting) html += '<div class="admin-banner">🙈 ' + t('hiddenBanner') + '</div>';
+      if (d.totals) html += renderKpis(d);
+      html += renderBoard(d);
+      html += renderChart(d);
+    }
     html += renderDetailShell(d);
     if (d.viewer.isAdmin) html += renderAdmin(d);
     document.getElementById('app').innerHTML = html;
@@ -429,8 +443,7 @@
   function areaGroups() {
     var groups = [], idx = {};
     DATA.detailRestaurants.forEach(function (n) {
-      var r = restByName(n);
-      var a = (r && r.area) || t('noArea');
+      var a = (DATA.detailAreas && DATA.detailAreas[n]) || t('noArea');
       if (!idx.hasOwnProperty(a)) { idx[a] = groups.length; groups.push({ area: a, names: [] }); }
       groups[idx[a]].names.push(n);
     });
@@ -635,10 +648,13 @@
       '<div class="admin-actions">' +
       '<button class="btn" data-act="adminPullTalentLMS" data-c="cPull">' + t('aPull') + '</button>' +
       '<button class="btn" data-act="adminSyncFromSheet" data-c="cSync">' + t('aSync') + '</button>' +
+      '<button class="btn' + (a.rankingHiddenSetting ? ' primary' : '') + '" data-act="adminToggleRanking" data-c="' + (a.rankingHiddenSetting ? 'cShowRank' : 'cHideRank') + '">' +
+        (a.rankingHiddenSetting ? '👁 ' : '🙈 ') + t('aToggleRank') + '</button>' +
       (d.frozen
         ? '<button class="btn primary" data-act="adminUnfreeze" data-c="cUnfreeze">🔓 ' + t('aUnfreeze') + '</button>'
         : '<button class="btn danger" data-act="adminFreeze" data-c="cFreeze">🔒 ' + t('aFreeze') + '</button>') +
       '</div><div class="admin-info">' +
+      '<div>' + t('rankState') + ': <b>' + (a.rankingHiddenSetting ? t('rankHidden') : t('rankShown')) + '</b></div>' +
       '<div>' + t('lastPull') + ': <b class="num">' + (a.lastPullAt ? fmtDate(a.lastPullAt, true) + ' (' + a.lastPullRows + ' ' + t('rows') + ')' : '—') + '</b></div>' +
       (a.lastError ? '<div class="err">' + t('lastErr') + ': ' + esc(a.lastError) + '</div>' : '') +
       '<div style="margin-top:8px"><b>' + t('warn') + '</b></div>' + (blocks || '<div>' + t('noWarn') + '</div>') +

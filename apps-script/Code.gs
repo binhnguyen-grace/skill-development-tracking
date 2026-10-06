@@ -51,7 +51,12 @@ function getDashboardData() {
   var access = getAccess_(email);
   var snap = loadSnapshot_();
   var props = PropertiesService.getScriptProperties();
+  // Admin đang tạm ẩn kết quả xếp hạng với quản lý nhà hàng → không gửi dữ liệu B, C, D
+  var hide = access.hideRanking;
+  var areaOf = {};
+  snap.restaurants.forEach(function (r) { areaOf[r.name] = r.area || ''; });
   var out = {
+    rankingHidden: hide,
     generatedAt: snap.generatedAt,
     frozen: snap.frozen,
     frozenAt: snap.frozenAt,
@@ -59,22 +64,26 @@ function getDashboardData() {
     campaign: snap.campaign,
     courses: snap.courses,
     // Số partner hoàn thành / tổng chỉ gửi cho admin; người khác chỉ thấy %
-    restaurants: snap.restaurants.map(function (r) { return publicRow_(r, access.isAdmin); }),
-    leaderboard: snap.leaderboard.map(function (r) { return publicRow_(r, access.isAdmin); }),
+    restaurants: hide ? [] : snap.restaurants.map(function (r) { return publicRow_(r, access.isAdmin); }),
+    leaderboard: hide ? [] : snap.leaderboard.map(function (r) { return publicRow_(r, access.isAdmin); }),
     // Ô KPI chỉ dành cho Manager list (và admin)
-    totals: access.canViewAll ? snap.totals : null,
-    areas: access.canViewAll ? snap.areas : null,
+    totals: access.canViewAll && !hide ? snap.totals : null,
+    areas: access.canViewAll && !hide ? snap.areas : null,
     viewer: { email: email, isAdmin: access.isAdmin, canViewAll: access.canViewAll },
     detailRestaurants: access.canViewAll
       ? snap.restaurants.map(function (r) { return r.name; })
       : access.restaurants.filter(function (n) { return snap.details.hasOwnProperty(n); })
   };
+  // Area của các nhà hàng được xem chi tiết (để nhóm theo Area kể cả khi đang ẩn xếp hạng)
+  out.detailAreas = {};
+  out.detailRestaurants.forEach(function (n) { out.detailAreas[n] = areaOf[n] || ''; });
   if (access.isAdmin) {
     out.admin = {
       lastPullAt: Number(props.getProperty('LAST_PULL_AT')) || null,
       lastPullRows: Number(props.getProperty('LAST_PULL_ROWS')) || 0,
       lastError: props.getProperty('LAST_ERROR') || '',
-      warnings: snap.warnings
+      warnings: snap.warnings,
+      rankingHiddenSetting: isRankingHidden_()
     };
   }
   return out;
@@ -128,6 +137,18 @@ function adminFreeze() {
   setFrozen_(true, currentEmail_());
   buildSnapshot();
   return true;
+}
+
+/** Bật/tắt ẩn kết quả xếp hạng (phần B, C, D) với quản lý nhà hàng. Trả về trạng thái mới. */
+function adminToggleRanking() {
+  requireAdmin_();
+  var hidden = !isRankingHidden_();
+  PropertiesService.getScriptProperties().setProperty('RANKING_HIDDEN', hidden ? '1' : '0');
+  return hidden;
+}
+
+function isRankingHidden_() {
+  return PropertiesService.getScriptProperties().getProperty('RANKING_HIDDEN') === '1';
 }
 
 function adminUnfreeze() {
@@ -420,6 +441,8 @@ function getAccess_(email) {
   var isAdmin = !!email && map.admins.indexOf(email) !== -1;
   return {
     isAdmin: isAdmin,
+    // Admin luôn thấy; chỉ ẩn với email trong cột C (Restaurant list) và cột A, B (Manager list)
+    hideRanking: !isAdmin && !!email && isRankingHidden_() && (map.hideFor || []).indexOf(email) !== -1,
     canViewAll: isAdmin || (!!email && map.managers.indexOf(email) !== -1),
     restaurants: email ? (map.byEmail[email] || []) : []
   };
@@ -428,10 +451,11 @@ function getAccess_(email) {
 /** Đọc quyền từ sheet (cache 5 phút) — không phụ thuộc vào việc Chốt. */
 function getAccessMap_() {
   var cache = CacheService.getScriptCache();
-  var hit = cache.get('access_map');
+  var hit = cache.get('access_map_v2');
   if (hit) return JSON.parse(hit);
 
   var byEmail = {};
+  var hideFor = []; // danh sách quản lý bị ẩn kết quả xếp hạng khi admin bật "Ẩn"
   var rSheet = SpreadsheetApp.getActive().getSheetByName(SHEETS.RESTAURANTS);
   if (rSheet && rSheet.getLastRow() > 1) {
     var values = rSheet.getDataRange().getValues();
@@ -440,6 +464,7 @@ function getAccessMap_() {
     var iMails = [];
     headers.forEach(function (h, i) { if (h.indexOf('manager') !== -1 && h.indexOf('email') !== -1) iMails.push(i); });
     values.slice(1).forEach(function (row) {
+      splitEmails(row[2]).forEach(function (e) { hideFor.push(e); }); // cột C
       var name = String(row[iName] || '').trim();
       if (!name) return;
       iMails.forEach(function (i) {
@@ -455,7 +480,12 @@ function getAccessMap_() {
   var mSheet = SpreadsheetApp.getActive().getSheetByName(SHEETS.MANAGERS);
   if (mSheet && mSheet.getLastRow() > 0) {
     mSheet.getRange(1, 1, mSheet.getLastRow(), 3).getValues().forEach(function (row) {
-      row.forEach(function (cell) { splitEmails(cell).forEach(function (e) { managers.push(e); }); });
+      row.forEach(function (cell, i) {
+        splitEmails(cell).forEach(function (e) {
+          managers.push(e);
+          if (i < 2) hideFor.push(e); // cột A, B
+        });
+      });
     });
   }
 
@@ -463,8 +493,8 @@ function getAccessMap_() {
   var owner = normEmail(Session.getEffectiveUser().getEmail());
   if (owner) admins.push(owner);
 
-  var map = { byEmail: byEmail, managers: managers, admins: admins };
-  cache.put('access_map', JSON.stringify(map), 300);
+  var map = { byEmail: byEmail, managers: managers, admins: admins, hideFor: hideFor };
+  cache.put('access_map_v2', JSON.stringify(map), 300);
   return map;
 }
 
