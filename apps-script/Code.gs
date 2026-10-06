@@ -139,7 +139,7 @@ function adminFreeze() {
   return true;
 }
 
-/** Bật/tắt ẩn kết quả xếp hạng (phần B, C, D) với quản lý nhà hàng. Trả về trạng thái mới. */
+/** Bật/tắt ẩn kết quả xếp hạng (phần B, C, D) với mọi người trừ admin và cột C sheet Manager list. Trả về trạng thái mới. */
 function adminToggleRanking() {
   requireAdmin_();
   var hidden = !isRankingHidden_();
@@ -441,8 +441,8 @@ function getAccess_(email) {
   var isAdmin = !!email && map.admins.indexOf(email) !== -1;
   return {
     isAdmin: isAdmin,
-    // Admin luôn thấy; chỉ ẩn với email trong cột C (Restaurant list) và cột A, B (Manager list)
-    hideRanking: !isAdmin && !!email && isRankingHidden_() && (map.hideFor || []).indexOf(email) !== -1,
+    // Khi admin bật "Ẩn": ẩn với tất cả, trừ admin và email ở cột C sheet Manager list
+    hideRanking: isRankingHidden_() && !isAdmin && (map.seeWhenHidden || []).indexOf(email) === -1,
     canViewAll: isAdmin || (!!email && map.managers.indexOf(email) !== -1),
     restaurants: email ? (map.byEmail[email] || []) : []
   };
@@ -451,11 +451,11 @@ function getAccess_(email) {
 /** Đọc quyền từ sheet (cache 5 phút) — không phụ thuộc vào việc Chốt. */
 function getAccessMap_() {
   var cache = CacheService.getScriptCache();
-  var hit = cache.get('access_map_v2');
+  var hit = cache.get('access_map_v3');
   if (hit) return JSON.parse(hit);
 
   var byEmail = {};
-  var hideFor = []; // danh sách quản lý bị ẩn kết quả xếp hạng khi admin bật "Ẩn"
+  var seeWhenHidden = []; // cột C sheet Manager list: vẫn thấy kết quả xếp hạng khi admin bật "Ẩn"
   var rSheet = SpreadsheetApp.getActive().getSheetByName(SHEETS.RESTAURANTS);
   if (rSheet && rSheet.getLastRow() > 1) {
     var values = rSheet.getDataRange().getValues();
@@ -464,7 +464,6 @@ function getAccessMap_() {
     var iMails = [];
     headers.forEach(function (h, i) { if (h.indexOf('manager') !== -1 && h.indexOf('email') !== -1) iMails.push(i); });
     values.slice(1).forEach(function (row) {
-      splitEmails(row[2]).forEach(function (e) { hideFor.push(e); }); // cột C
       var name = String(row[iName] || '').trim();
       if (!name) return;
       iMails.forEach(function (i) {
@@ -483,7 +482,7 @@ function getAccessMap_() {
       row.forEach(function (cell, i) {
         splitEmails(cell).forEach(function (e) {
           managers.push(e);
-          if (i < 2) hideFor.push(e); // cột A, B
+          if (i === 2) seeWhenHidden.push(e); // cột C
         });
       });
     });
@@ -493,8 +492,8 @@ function getAccessMap_() {
   var owner = normEmail(Session.getEffectiveUser().getEmail());
   if (owner) admins.push(owner);
 
-  var map = { byEmail: byEmail, managers: managers, admins: admins, hideFor: hideFor };
-  cache.put('access_map_v2', JSON.stringify(map), 300);
+  var map = { byEmail: byEmail, managers: managers, admins: admins, seeWhenHidden: seeWhenHidden };
+  cache.put('access_map_v3', JSON.stringify(map), 300);
   return map;
 }
 

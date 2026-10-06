@@ -237,7 +237,7 @@ Mở sheet **LMS Learning Progress** kiểm tra: cột EmployeeCode có đúng m
 | **Chốt kết quả** | Khu Admin → **🔒 Chốt bảng xếp hạng** → OK. Hệ thống tính lại theo dữ liệu mới nhất trong sheet rồi khóa. Mỗi sáng TalentLMS vẫn đổ vào sheet nhưng **dashboard không đổi**. |
 | Gia hạn chiến dịch sau khi đã chốt | Bấm **🔓 Mở chốt** — dashboard tự cập nhật lại mỗi sáng. Nhớ sửa `Expected End` trong Config. |
 | Đang chốt nhưng muốn cập nhật 1 lần | Bấm **Sync lại dữ liệu từ sheet** — dashboard cập nhật nhưng vẫn giữ trạng thái chốt. |
-| **Tạm ẩn kết quả xếp hạng** | Khu Admin → **🙈 Ẩn/ hiện kết quả xếp hạng**. Khi ẨN: email ở **cột C sheet Restaurant list** và **cột A, B sheet Manager list** không thấy ô KPI, Bảng vinh danh, Biểu đồ (vẫn thấy Tiến độ chi tiết). Bấm lại để HIỆN. Người xem cần tải lại trang (F5) để thấy thay đổi. |
+| **Tạm ẩn kết quả xếp hạng** | Khu Admin → **🙈 Ẩn/ hiện kết quả xếp hạng**. Khi ẨN: **tất cả mọi người** không thấy ô KPI, Bảng vinh danh, Biểu đồ — **trừ admin và email ở cột C sheet Manager list**. RM và Manager list cột A, B vẫn xem được Tiến độ chi tiết như bình thường. Bấm lại để HIỆN. Người xem cần tải lại trang (F5) để thấy thay đổi. |
 | Xem có lỗi không | Khu Admin hiển thị lần lấy dữ liệu gần nhất, lỗi gần nhất (nếu có) và cảnh báo dữ liệu. |
 
 **Cảnh báo dữ liệu trong khu Admin nghĩa là gì:**
